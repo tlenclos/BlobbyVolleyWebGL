@@ -1,83 +1,79 @@
-/* Main Script */
-
 // Variables
 var camera, scene, renderer, stats, container;
-var cube, cube2, net, ball;
+var physics, field, players = [], ball;
 
 // Bootstrap
 init();
 render();
 
-// ## Init game
+// Init game
 function init() {
-	// Scene
-	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-	renderer = new THREE.WebGLRenderer();
-	container = document.body;
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	container.appendChild(renderer.domElement);
+    // Scene
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer();
+    container = document.body;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild( stats.domElement );
+    // Stats
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    container.appendChild(stats.domElement);
 
-	// Geometry and materials
-	var geometryPlayers = new THREE.CubeGeometry(1,1,1); 
-	var geometryNet = new THREE.CubeGeometry(1, 3, 5);
-	var geometryBall = new THREE.SphereGeometry(0.5);
+    // Physics
+    physics = new Physics(10);
 
-	var materialPlayer1 = new THREE.MeshBasicMaterial({color: 0x00ff00});
-	var materialPlayer2 = new THREE.MeshBasicMaterial({color: 0xE01B56});
-	var materialNet = new THREE.MeshBasicMaterial({color: 0xA8A9AD});
-	var materialBall = new THREE.MeshBasicMaterial({color: 0xB2BEED});
+    // Field
+    field = new Field(physics.getWorld(), 0, 0, 22, 10);
 
-	// Players
-	cube = new THREE.Mesh(geometryPlayers, materialPlayer1);
-	cube.position.x = -3;
-	cube2 = new THREE.Mesh(geometryPlayers, materialPlayer2);
-	cube2.position.x = 3;
+    // Blobs
+    var blob1 = new Blob(physics.getWorld(), 0x00ff00, [-5, 0]);
+    var blob2 = new Blob(physics.getWorld(), 0xff0000, [5, 0]);
 
-	// Field
-	net = new THREE.Mesh(geometryNet, materialNet);
+    // Players
+    var p1 = new Player('P1', ['z', 'd', 'q']);
+    p1.attachBlob(blob1);
 
-	// Ball
-	ball = new THREE.Mesh(geometryBall);
-	ball.position.y = 3;
+    var p2 = new Player('P2', ['up', 'right', 'left']);
+    p2.attachBlob(blob2);
 
-	// Add objects
-	scene.add(cube);  
-	scene.add(cube2);
-	scene.add(net);
-	scene.add(ball);
+    players.push(p1, p2);
 
-	// Camera default position
-	camera.position.y = 2;
-	camera.position.z = 7;
+    // Ball
+    ball = new Ball(physics.getWorld(), 0xff000, [-3, 5]);
 
-	// Events
-	document.addEventListener('mousemove', onMouseMove, false);
+    // Add all meshes to the scene
+    var fieldParts = field.getWalls();
 
-	function onMouseMove(event) {
-		var mouseX = event.clientX - window.innerWidth/2;
-		var mouseY = event.clientY - window.innerHeight/2;
-		camera.position.x += (mouseX - camera.position.x) * 0.00005;
-		camera.position.y += (-mouseY - camera.position.y) * 0.00005;
-		camera.lookAt(scene.position);
-		renderer.render(scene, camera);
-	}
+    for (var fieldItem in fieldParts) {
+        scene.add(fieldParts[fieldItem]);
+    }
 
+    scene.add(blob1.threeObject);
+    scene.add(blob2.threeObject);
+    scene.add(ball.threeObject);
+
+    // Camera default position
+    camera.position.y = 0;
+    camera.position.z = 12;
 }
 
-// ## Animate and Render the 3D Scene
+// Animate and Render the 3D Scene
 function render() {
-	requestAnimationFrame(render);
+    for (var p in players) {
+        players[p].listenInput();
+        players[p].blob.physics();
+    }
 
-	// update the stats
-	stats.update();
-	cube.rotation.x = cube2.rotation.x += 0.01;
-	cube.rotation.y = cube2.rotation.y += 0.01;
+    ball.physics();
+    physics.step();
 
-	renderer.render(scene, camera);
+    requestAnimationFrame(render);
+
+    // update the stats
+    stats.update();
+
+    renderer.render(scene, camera);
 }
