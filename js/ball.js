@@ -34,7 +34,7 @@ function Ball (world, color, spawnPosition) {
         this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
         var geometry = new THREE.CylinderGeometry(this.radius, this.radius, 0, 50, 1, false);
-        var material = new THREE.MeshBasicMaterial({color: this.color});
+        var material = new THREE.MeshBasicMaterial({ color: this.color });
         this.threeObject = new THREE.Mesh(geometry, material);
         this.threeObject.rotation.x += 90 * Math.PI / 180;
     };

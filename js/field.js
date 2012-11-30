@@ -17,7 +17,7 @@ function Field (world, x, y, width, height) {
         var ground, ceil, leftWall, rightWall, net;
         var wallColor = 0x000000;
 
-        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor);
+        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, 1, 0.5, 0, "type_ground");
         ceil = this.createWall(x, y + (height / 2) + 0.5, width, 0.5, wallColor);
         leftWall = this.createWall(x - (width / 2) - 0.5, y, 0.5, height, wallColor, null, 0);
         rightWall = this.createWall(x + (width / 2) + 0.5, y, 0.5, height, wallColor, null, 0);
@@ -26,7 +26,7 @@ function Field (world, x, y, width, height) {
         this.walls.push(ground, ceil, leftWall, rightWall, net);
     };
 
-    this.createWall = function (x, y, width, height, color, density, friction, restitution) {
+    this.createWall = function (x, y, width, height, color, density, friction, restitution, userdata) {
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
@@ -44,7 +44,13 @@ function Field (world, x, y, width, height) {
             fixDef.shape.SetAsBox(width, height / 2);
         }
 
-        this.world.CreateBody(bodyDef).CreateFixture(fixDef);
+        var body = this.world.CreateBody(bodyDef);
+
+        if(userdata) {
+            body.SetUserData(userdata);
+        }
+
+        body.CreateFixture(fixDef);
 
         var geometry = width > height
             ? new THREE.CubeGeometry(width, height * 2, 0)

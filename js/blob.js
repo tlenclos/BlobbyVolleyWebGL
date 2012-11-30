@@ -32,6 +32,7 @@ function Blob (world, color, spawnPosition) {
 
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_dynamicBody;
+        bodyDef.fixedRotation = true;
         bodyDef.position.x = this.spawnPosition[0];
         bodyDef.position.y = this.spawnPosition[1];
 
@@ -64,12 +65,23 @@ function Blob (world, color, spawnPosition) {
             yVelocity = body.GetLinearVelocity().y
         ;
 
-        // Allow jumping
-        if (!this.jumpAllowed && this.yVelocity < 0 && yVelocity == 0) {
-            this.jumpAllowed = true;
+        // Check contact with ground
+        var contacts = body.GetContactList();
+        var isTouchingGround = false;
+        if(contacts) {
+            var contact = contacts.contact;
+            var contactUserData = contact.GetFixtureB().GetBody().GetUserData();
+            isTouchingGround = contact.IsTouching()
+                               && contactUserData === "type_ground"
+                               ? true
+                               : false
+            ;
         }
 
-        this.yVelocity = yVelocity;
+        // Allow jumping
+        if (!this.jumpAllowed && yVelocity < 0.00001 && isTouchingGround) {
+            this.jumpAllowed = true;
+        }
 
         // Jumping
         if (this.jumpAllowed) {
