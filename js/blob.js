@@ -16,7 +16,6 @@ function Blob (world, color, spawnPosition) {
     this.size = 1;
     this.speed = 10;
     this.jumpAllowed = false;
-    this.yVelocity = -1;
 
     // Methods
     this.init = function() {
@@ -65,21 +64,8 @@ function Blob (world, color, spawnPosition) {
             yVelocity = body.GetLinearVelocity().y
         ;
 
-        // Check contact with ground
-        var contacts = body.GetContactList();
-        var isTouchingGround = false;
-        if(contacts) {
-            var contact = contacts.contact;
-            var contactUserData = contact.GetFixtureB().GetBody().GetUserData();
-            isTouchingGround = contact.IsTouching()
-                               && contactUserData === "type_ground"
-                               ? true
-                               : false
-            ;
-        }
-
         // Allow jumping
-        if (!this.jumpAllowed && yVelocity < 0.00001 && isTouchingGround) {
+        if (!this.jumpAllowed && yVelocity < 0.00001 && this.isTouchingGround()) {
             this.jumpAllowed = true;
         }
 
@@ -93,6 +79,21 @@ function Blob (world, color, spawnPosition) {
             // Prevent jumping
             this.jumpAllowed = false;
         }
+    };
+
+    this.isTouchingGround = function () {
+        var contacts = this.fixture.GetBody().GetContactList(),
+            isTouchingGround = false
+        ;
+
+        if (contacts) {
+            var contact = contacts.contact,
+                contactUserData = contact.GetFixtureB().GetBody().GetUserData()
+            ;
+            isTouchingGround = contact.IsTouching() && contactUserData === 'type_ground';
+        }
+
+        return isTouchingGround;
     };
 
     this.physics = function () {
