@@ -14,16 +14,15 @@ function Field (world, x, y, width, height) {
 
     // Methods
     this.init = function () {
-        var ground, ceil, leftWall, rightWall, net;
+        var ground, leftWall, rightWall, net;
         var wallColor = 0x000000;
 
         ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, null, null, null, 'type_ground');
-        ceil = this.createWall(x, y + (height / 2) + 0.5, width, 0.5, wallColor);
-        leftWall = this.createWall(x - (width / 2) - 0.5, y, 0.5, height, wallColor, null, 0);
-        rightWall = this.createWall(x + (width / 2) + 0.5, y, 0.5, height, wallColor, null, 0);
-        net = this.createWall(x, y - (height / 2) + (height / 4), 0.5, height / 2, wallColor, null, 0);
+        leftWall = this.createWall(x - (width / 2) - 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
+        rightWall = this.createWall(x + (width / 2) + 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
+        net = this.createWall(x, y - (height / 2) + (height / 4), 0.25, height / 2, wallColor, null, 0);
 
-        this.walls.push(ground, ceil, leftWall, rightWall, net);
+        this.walls.push(ground, leftWall, rightWall, net);
     };
 
     this.createWall = function (x, y, width, height, color, density, friction, restitution, userData) {
