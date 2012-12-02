@@ -11,7 +11,7 @@ function Ball (world, color, spawnPosition) {
     this.world = world;
     this.color = color;
     this.spawnPosition = spawnPosition;
-    this.radius = 0.5;
+    this.radius = 0.75;
     this.maxSpeed = 12;
     this.fixture = null;
     this.threeObject = null;
