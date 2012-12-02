@@ -20,7 +20,7 @@ function Blob (world, color, spawnPosition) {
     // Methods
     this.init = function() {
         var fixDef = new b2FixtureDef;
-        fixDef.density = 1;
+        fixDef.density = 100;
         fixDef.friction = 1;
         fixDef.restitution = 0;
         fixDef.shape = new b2PolygonShape;
@@ -54,7 +54,7 @@ function Blob (world, color, spawnPosition) {
 
         // Horizontal move
         this.fixture.GetBody().ApplyForce(
-            new b2Vec2(this.speed * x, 0),
+            new b2Vec2(this.speed * x * this.fixture.GetBody().GetMass(), 0),
             this.fixture.GetBody().GetDefinition().position
         );
     };
@@ -72,7 +72,7 @@ function Blob (world, color, spawnPosition) {
         // Jumping
         if (this.jumpAllowed) {
             body.ApplyImpulse(
-                new b2Vec2(0, 9),
+                new b2Vec2(0, 9 * this.fixture.GetBody().GetMass()),
                 body.GetDefinition().position
             );
 
