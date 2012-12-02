@@ -14,7 +14,7 @@ function Blob (world, color, spawnPosition) {
     this.fixture = null;
     this.threeObject = null;
     this.size = 1;
-    this.speed = 10;
+    this.speed = 20;
     this.jumpAllowed = false;
 
     // Methods
