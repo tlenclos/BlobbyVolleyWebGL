@@ -80,14 +80,17 @@ function Blob (world, color, spawnPosition) {
 
     this.isTouchingGround = function () {
         var contacts = this.fixture.GetBody().GetContactList(),
+            groundContact,
             isTouchingGround = false
         ;
 
-        if (contacts) {
-            var contact = contacts.contact,
-                contactUserData = contact.GetFixtureB().GetBody().GetUserData()
-            ;
-            isTouchingGround = contact.IsTouching() && contactUserData === 'type_ground';
+        while (typeof groundContact === 'undefined' && contacts !== null) {
+            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {
+                groundContact = contacts.contact;
+                isTouchingGround = groundContact.IsTouching();
+            }
+
+            contacts = contacts.next;
         }
 
         return isTouchingGround;
