@@ -17,7 +17,7 @@ function Field (world, x, y, width, height) {
         var ground, ceil, leftWall, rightWall, net;
         var wallColor = 0x000000;
 
-        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, 1, 0.5, 0, "type_ground");
+        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, null, null, null, 'type_ground');
         ceil = this.createWall(x, y + (height / 2) + 0.5, width, 0.5, wallColor);
         leftWall = this.createWall(x - (width / 2) - 0.5, y, 0.5, height, wallColor, null, 0);
         rightWall = this.createWall(x + (width / 2) + 0.5, y, 0.5, height, wallColor, null, 0);
@@ -26,7 +26,7 @@ function Field (world, x, y, width, height) {
         this.walls.push(ground, ceil, leftWall, rightWall, net);
     };
 
-    this.createWall = function (x, y, width, height, color, density, friction, restitution, userdata) {
+    this.createWall = function (x, y, width, height, color, density, friction, restitution, userData) {
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
@@ -46,8 +46,8 @@ function Field (world, x, y, width, height) {
 
         var body = this.world.CreateBody(bodyDef);
 
-        if(userdata) {
-            body.SetUserData(userdata);
+        if (typeof userData !== 'undefined') {
+            body.SetUserData(userData);
         }
 
         body.CreateFixture(fixDef);
