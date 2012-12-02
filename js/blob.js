@@ -4,7 +4,7 @@ function Blob (world, color, spawnPosition) {
         b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,
         b2Body = Box2D.Dynamics.b2Body,
-        b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+        b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
     ;
 
     // Properties
@@ -13,7 +13,7 @@ function Blob (world, color, spawnPosition) {
     this.spawnPosition = spawnPosition;
     this.fixture = null;
     this.threeObject = null;
-    this.size = 1;
+    this.radius = 1;
     this.speed = 20;
     this.jumpAllowed = false;
 
@@ -23,11 +23,7 @@ function Blob (world, color, spawnPosition) {
         fixDef.density = 100;
         fixDef.friction = 1;
         fixDef.restitution = 0;
-        fixDef.shape = new b2PolygonShape;
-        fixDef.shape.SetAsBox(
-            this.size / 2,
-            this.size / 2
-        );
+        fixDef.shape = new b2CircleShape(this.radius);
 
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_dynamicBody;
@@ -37,9 +33,10 @@ function Blob (world, color, spawnPosition) {
 
         this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-        var geometry = new THREE.CubeGeometry(this.size, this.size, 0);
+        var geometry = new THREE.CylinderGeometry(this.radius, this.radius, 0, 7, 1, false);
         var material = new THREE.MeshBasicMaterial({ color: this.color });
         this.threeObject = new THREE.Mesh(geometry, material);
+        this.threeObject.rotation.x += 90 * Math.PI / 180;
     };
 
     this.getFixture = function () {
