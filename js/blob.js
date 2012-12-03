@@ -14,7 +14,7 @@ function Blob (world, color, spawnPosition) {
     this.fixture = null;
     this.threeObject = null;
     this.radius = 1;
-    this.speed = 20;
+    this.speed = 5;
     this.jumpAllowed = false;
 
     // Methods
@@ -49,11 +49,20 @@ function Blob (world, color, spawnPosition) {
             this.handleJump();
         }
 
+
         // Horizontal move
-        this.fixture.GetBody().ApplyForce(
-            new b2Vec2(this.speed * x * this.fixture.GetBody().GetMass(), 0),
-            this.fixture.GetBody().GetDefinition().position
-        );
+        if (x !== 0) {
+            var body = this.fixture.GetBody(),
+                vel = body.GetLinearVelocity(),
+                velDelta = (this.speed * x) - vel.x,
+                force = body.GetMass() * velDelta / (1 / 60) // TODO A revoir
+            ;
+
+            body.ApplyForce(
+                new b2Vec2(force, 0),
+                body.GetDefinition().position
+            );
+        }
     };
 
     this.handleJump = function () {
