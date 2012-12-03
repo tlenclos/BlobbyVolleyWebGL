@@ -1,6 +1,7 @@
 function Ball (world, color, spawnPosition) {
     // Shortcuts
-    var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+    var b2Vec2 = Box2D.Common.Math.b2Vec2,
+        b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,
         b2Body = Box2D.Dynamics.b2Body,
         b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
@@ -10,7 +11,8 @@ function Ball (world, color, spawnPosition) {
     this.world = world;
     this.color = color;
     this.spawnPosition = spawnPosition;
-    this.radius = 0.5;
+    this.radius = 0.75;
+    this.maxSpeed = 12;
     this.fixture = null;
     this.threeObject = null;
 
@@ -40,7 +42,21 @@ function Ball (world, color, spawnPosition) {
     };
 
     this.physics = function () {
-        var pos = this.fixture.GetBody().GetDefinition().position;
+        var body = this.fixture.GetBody(),
+            pos = body.GetDefinition().position,
+            velocity = body.GetLinearVelocity(),
+            speed = velocity.Length()
+        ;
+
+        if (speed > this.maxSpeed) {
+            body.SetLinearVelocity(
+                new b2Vec2(
+                    this.maxSpeed / speed * velocity.x,
+                    this.maxSpeed / speed * velocity.y
+                )
+            );
+        }
+
         this.threeObject.position.x = pos.x;
         this.threeObject.position.y = pos.y;
     };

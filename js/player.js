@@ -14,13 +14,32 @@ function Player (name, controls) {
         this.keyboard = new THREEx.KeyboardState();
     };
 
+    this.getControlsAntagonistKey = function (key) {
+        var antagonists = {
+            'left': 'right',
+            'right': 'left'
+        };
+
+        return antagonists[key];
+    };
+
     this.listenInput = function () {
         var x = 0,
             y = 0
         ;
 
         for (var key in this.controls) {
-            if (this.keyboard.pressed(this.controls[key])) {
+            var control = this.controls[key],
+                antagonistControl = this.controls[this.getControlsAntagonistKey(key)]
+            ;
+
+            if (
+                this.keyboard.pressed(control)
+                &&
+                (
+                    typeof antagonistControl === 'undefined' || !this.keyboard.pressed(antagonistControl)
+                )
+            ) {
                 switch (key) {
                 case 'up':
                     y = 1;
