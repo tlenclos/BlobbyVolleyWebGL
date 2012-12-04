@@ -22,7 +22,7 @@ function Physics (gravity) {
 
     this.step = function () {
         this.world.Step(
-            1 / 60, // TODO A revoir
+            1 / 60, // TODO Refactor this
             10,
             10
         );
