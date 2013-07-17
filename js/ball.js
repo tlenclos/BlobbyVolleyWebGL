@@ -15,6 +15,7 @@ function Ball (world, color, spawnPosition) {
     this.maxSpeed = 12;
     this.fixture = null;
     this.threeObject = null;
+    this.sound = null;
 
     // Methods
     this.getFixture = function () {
@@ -39,6 +40,8 @@ function Ball (world, color, spawnPosition) {
         var material = new THREE.MeshBasicMaterial({ color: this.color });
         this.threeObject = new THREE.Mesh(geometry, material);
         this.threeObject.rotation.x += 90 * Math.PI / 180;
+
+        this.sound = new Sound(['sounds/ball.mp3', 'sounds/ball.ogg']);
     };
 
     this.physics = function () {
@@ -59,6 +62,23 @@ function Ball (world, color, spawnPosition) {
 
         this.threeObject.position.x = pos.x;
         this.threeObject.position.y = pos.y;
+
+        if (this.hasTouchingContact()) {
+            this.sound.play(true);
+        }
+    };
+
+    this.hasTouchingContact = function () {
+        var touching = false,
+            contacts = this.fixture.GetBody().GetContactList()
+        ;
+
+        while (touching === false && contacts !== null) {
+            touching = contacts.contact.IsTouching();
+            contacts = contacts.next;
+        }
+
+        return touching;
     };
 
     this.init();
