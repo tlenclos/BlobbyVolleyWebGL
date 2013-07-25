@@ -16,6 +16,9 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
+    // Window resizing
+    THREEx.WindowResize(renderer, camera);
+
     // Stats
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
