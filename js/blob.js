@@ -55,7 +55,7 @@ function Blob (world, color, spawnPosition) {
             var body = this.fixture.GetBody(),
                 vel = body.GetLinearVelocity(),
                 velDelta = (this.speed * x) - vel.x,
-                force = body.GetMass() * velDelta / (1 / 60) // TODO Refactor this
+                force = body.GetMass() * velDelta / (dt)
             ;
 
             body.ApplyForce(
