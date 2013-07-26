@@ -1,5 +1,5 @@
 // Variables
-var camera, scene, renderer, stats, container;
+var camera, scene, renderer, stats, container, oldTime, dt = 1 / 60;
 var party;
 
 // Bootstrap
@@ -50,7 +50,11 @@ function init() {
 }
 
 // Animate and Render the 3D Scene
-function render() {
+function render(time) {
+    // Sync physics with time
+    dt = ((time - oldTime) / 1000) || dt;
+    oldTime = time;
+
     party.update();
 
     requestAnimationFrame(render);
