@@ -17,7 +17,7 @@ function Field (world, x, y, width, height) {
         var ground, leftWall, rightWall, net;
         var wallColor = 0x000000;
 
-        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, null, null, null, 'type_ground');
+        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, null, 2, null, 'type_ground');
         leftWall = this.createWall(x - (width / 2) - 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
         rightWall = this.createWall(x + (width / 2) + 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
         net = this.createWall(x, y - (height / 2) + (height / 4), 0.25, height / 2, wallColor, null, 0);

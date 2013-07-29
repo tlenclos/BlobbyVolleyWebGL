@@ -11,7 +11,7 @@ function Ball (world, color, spawnPosition) {
     this.world = world;
     this.color = color;
     this.spawnPosition = spawnPosition;
-    this.radius = 0.75;
+    this.radius = 1.1; // TODO : If we reduce the radius the ball can be stuck against a wall and the blob can't move it
     this.maxSpeed = 12;
     this.fixture = null;
     this.threeObject = null;
