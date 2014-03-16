@@ -7,22 +7,16 @@ function Party (scene, rules, playersConfig) {
     this.field = null;
     this.players = null;
     this.ball = null;
+    this.scores = null;
     this.paused = false;
+    this.playingSide = null;
 
     // Methods
     this.init = function () {
         this.scene = scene;
         this.rules = rules;
         this.playersConfig = playersConfig;
-
-        this.listen('party:start', this.newGame);
-        this.listen('party:stop', this.endGame);
-        this.listen('party:pause', this.pause);
-    };
-
-    this.listen = function (type, listener, capture) {
-        document.removeEventListener(type, listener, capture);
-        document.addEventListener(type, listener, capture);
+        this.resetScore();
     };
 
     this.clearScene = function () {
@@ -34,9 +28,19 @@ function Party (scene, rules, playersConfig) {
         }
     };
 
+    this.resetScore = function () {
+        this.scores = {
+            left: 0,
+            right: 0
+        };
+    };
+
     this.newGame = function () {
         // Clear scene
         this.clearScene();
+
+        // Reset score
+        this.resetScore();
 
         // Physics
         this.physics = new Physics(10);
@@ -59,7 +63,7 @@ function Party (scene, rules, playersConfig) {
             color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
 
             blob = new Blob(this.physics.getWorld(), color, position);
-            player = new Player(playerConfig.name, playerConfig.controls);
+            player = new Player(playerConfig.name, playerConfig.controls, playerConfig.position);
             player.attachBlob(blob);
 
             this.players.push(player);
@@ -81,7 +85,22 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.endGame = function () {
+        // TODO Better UI
+        alert(_.invert(this.scores)[_.max(this.scores)] + ' player wins');
         this.newGame();
+    };
+
+    this.afterScoring = function (winSide) {
+        this.incrementScore(winSide);
+
+        // TODO Display score
+
+        // TODO Reset objects
+
+        // End of game
+        if (_.max(this.scores) >= this.rules.config.scoreToWin) {
+            this.endGame();
+        }
     };
 
     this.pause = function (pause) {
@@ -93,6 +112,8 @@ function Party (scene, rules, playersConfig) {
             return;
         }
 
+        this.applyRules();
+
         for (var i in this.players) {
             this.players[i].listenInput();
             this.players[i].getBlob().physics();
@@ -100,12 +121,57 @@ function Party (scene, rules, playersConfig) {
 
         this.ball.physics();
         this.physics.step();
-        this.applyRules();
     };
 
     this.applyRules = function () {
-        this.rules.apply();
+        var winSide = null,
+            resetTouches = false
+        ;
+
+        // Ball touching ground
+        if (this.ball.isTouchingGround()) {
+            winSide = this.ball.threeObject.position.x > 0 ? 'left' : 'right';
+
+        // Counting maximum touches
+        } else {
+            _.each(this.players, function (player) {
+                if (player.getBlob().isTouchingBall()) {
+                    player.currentTouches++;
+
+                    if (player.side !== this.playingSide) {
+                        // Switching side, reset touches
+                        if (!_.isNull(this.playingSide)) {
+                            resetTouches = true;
+                        }
+
+                        this.playingSide = player.side;
+                    }
+                }
+
+                // Maximum touches reached
+                if (player.currentTouches > this.rules.config.maximumContactsAllowed) {
+                    winSide = player.side === 'right' ? 'left' : 'right';
+                    resetTouches = true;
+                }
+            }, this);
+        }
+
+        // Reset touches count
+        if (resetTouches) {
+            _.each(this.players, function (player) {
+                player.currentTouches = 0;
+            });
+        }
+
+        // We have a winner for this round
+        if (winSide) {
+            this.afterScoring(winSide);
+        }
     };
+
+    this.incrementScore = function (side) {
+        this.scores[side]++;
+    }
 
     this.init();
 }

@@ -1,4 +1,4 @@
-function Player (name, controls) {
+function Player (name, controls, side) {
     // Properties
     this.name = name;
     this.controls = {
@@ -6,12 +6,16 @@ function Player (name, controls) {
         'right': controls[1],
         'left': controls[2]
     };
+    this.side = null;
     this.keyboard = null;
     this.blob = null;
+    this.currentTouches = null;
 
     // Methods
     this.init = function () {
+        this.side = side;
         this.keyboard = new THREEx.KeyboardState();
+        this.currentTouches = 0;
     };
 
     this.getControlsAntagonistKey = function (key) {

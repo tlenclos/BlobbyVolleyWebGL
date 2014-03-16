@@ -105,6 +105,24 @@ function Blob (world, color, spawnPosition) {
         return isTouchingGround;
     };
 
+    this.isTouchingBall = function () {
+        var contacts = this.fixture.GetBody().GetContactList(),
+            ballContact,
+            isTouchingBall = false
+        ;
+
+        while (typeof ballContact === 'undefined' && contacts !== null) {
+            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ball') {
+                ballContact = contacts.contact;
+                isTouchingBall = ballContact.IsTouching();
+            }
+
+            contacts = contacts.next;
+        }
+
+        return isTouchingBall;
+    };
+
     this.physics = function () {
         var pos = this.fixture.GetBody().GetDefinition().position;
         this.threeObject.position.x = pos.x;

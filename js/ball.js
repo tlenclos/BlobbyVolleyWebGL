@@ -33,6 +33,7 @@ function Ball (world, color, spawnPosition) {
         bodyDef.type = b2Body.b2_dynamicBody;
         bodyDef.position.x = this.spawnPosition[0];
         bodyDef.position.y = this.spawnPosition[1];
+        bodyDef.userData = 'type_ball';
 
         this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
@@ -79,6 +80,24 @@ function Ball (world, color, spawnPosition) {
         }
 
         return touching;
+    };
+
+    this.isTouchingGround = function () {
+        var contacts = this.fixture.GetBody().GetContactList(),
+            groundContact,
+            isTouchingGround = false
+        ;
+
+        while (typeof groundContact === 'undefined' && contacts !== null) {
+            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {
+                groundContact = contacts.contact;
+                isTouchingGround = groundContact.IsTouching();
+            }
+
+            contacts = contacts.next;
+        }
+
+        return isTouchingGround;
     };
 
     this.init();
