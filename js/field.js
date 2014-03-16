@@ -15,17 +15,50 @@ function Field (world, x, y, width, height) {
     // Methods
     this.init = function () {
         var ground, leftWall, rightWall, net;
-        var wallColor = 0x000000;
 
-        ground = this.createWall(x, y - (height / 2) - 0.5, width, 0.5, wallColor, null, 2, null, 'type_ground');
-        leftWall = this.createWall(x - (width / 2) - 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
-        rightWall = this.createWall(x + (width / 2) + 0.5, y + (height / 2), 0.5, height * 2, wallColor, null, 0);
-        net = this.createWall(x, y - (height / 2) + (height / 4), 0.25, height / 2, wallColor, null, 0);
+        ground = this.createWall(
+            x,
+            y - (height / 2) - 0.5,
+            width,
+            0.5,
+            null,
+            2,
+            null,
+            null,
+            'type_ground'
+        );
+
+        leftWall = this.createWall(
+            x - (width / 2) - 0.5,
+            y + (height / 2),
+            0.5,
+            height * 2,
+            null,
+            0
+        );
+
+        rightWall = this.createWall(
+            x + (width / 2) + 0.5,
+            y + (height / 2),
+            0.5,
+            height * 2,
+            null,
+            0
+        );
+
+        net = this.createWall(
+            x,
+            y - (height / 2) + (height / 4),
+            0.25,
+            height / 2,
+            null,
+            0
+        );
 
         this.walls.push(ground, leftWall, rightWall, net);
     };
 
-    this.createWall = function (x, y, width, height, color, density, friction, restitution, userData) {
+    this.createWall = function (x, y, width, height, density, friction, restitution, texture, userData) {
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
@@ -56,9 +89,22 @@ function Field (world, x, y, width, height) {
             : new THREE.CubeGeometry(width * 2, height, 0)
         ;
 
+        var material;
+
+        if (texture instanceof THREE.Texture) {
+            material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true
+            });
+        } else {
+            material = new THREE.MeshBasicMaterial({
+                color: 0x000000
+            });
+        }
+
         var mesh = new THREE.Mesh(
             geometry,
-            new THREE.MeshBasicMaterial({ color: color })
+            material
         );
         mesh.position.x = bodyDef.position.x;
         mesh.position.y = bodyDef.position.y;
