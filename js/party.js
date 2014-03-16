@@ -7,6 +7,7 @@ function Party (scene, rules, playersConfig) {
     this.field = null;
     this.players = null;
     this.ball = null;
+    this.paused = false;
 
     // Methods
     this.init = function () {
@@ -16,6 +17,7 @@ function Party (scene, rules, playersConfig) {
 
         this.listen('party:start', this.newGame);
         this.listen('party:stop', this.endGame);
+        this.listen('party:pause', this.pause);
     };
 
     this.listen = function (type, listener, capture) {
@@ -82,7 +84,15 @@ function Party (scene, rules, playersConfig) {
         this.newGame();
     };
 
+    this.pause = function (pause) {
+        this.paused = !_.isUndefined(pause) ? Boolean(pause) : !this.paused;
+    }
+
     this.update = function () {
+        if (this.paused) {
+            return;
+        }
+
         for (var i in this.players) {
             this.players[i].listenInput();
             this.players[i].getBlob().physics();

@@ -47,6 +47,13 @@ function init() {
     // Camera default position
     camera.position.y = 0;
     camera.position.z = 12;
+
+    // Pause party (space bar)
+    document.addEventListener('keyup', function (event) {
+        if (event.keyCode === 32) {
+            party.pause();
+        }
+    });
 }
 
 // Animate and Render the 3D Scene
