@@ -4,6 +4,36 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" media="screen" />
     </head>
     <body>
+        <div class="screen" id="mainMenu">
+            <p>Welcome to Blobby Volley WebGL</p>
+            <ul>
+                <li><a href="javascript:newParty()">Play</a></li>
+                <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
+            </ul>
+        </div>
+
+        <div class="screen" id="pauseMenu">
+            <p>Game is paused</p>
+            <ul>
+                <li><a href="javascript:pauseGame()">Resure</a></li>
+                <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
+                <li><a href="javascript:party.newGame()">Start a new game</a></li>
+            </ul>
+        </div>
+
+        <div class="screen" id="gameOverMenu">
+            <p id="gameOverMsg"></p>
+            <ul>
+                <li><a href="">Start a new game</a></li>
+            </ul>
+        </div>
+
+        <div class="screen" id="optionsMenu">
+            <p><a href="javascript:screenManager.goBack()">< Back</a> - Options</p>
+            <ul>
+            </ul>
+        </div>
+
         <script src="js/libs/underscore.js"></script>
         <script src="js/libs/three.js"></script>
         <script src="js/libs/THREEx.WindowResize.js"></script>
@@ -18,6 +48,7 @@
         <script src="js/ball.js"></script>
         <script src="js/party.js"></script>
         <script src="js/rules.js"></script>
+        <script src="js/screensManager.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>
