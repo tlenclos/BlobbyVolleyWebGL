@@ -98,9 +98,12 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.endGame = function () {
-        // TODO Better UI
-        alert(_.invert(this.scores)[_.max(this.scores)] + ' player wins');
-        this.newGame();
+        window.dispatchEvent(
+            new CustomEvent(
+                'endGame',
+                {detail: {message: _.invert(this.scores)[_.max(this.scores)] + ' player wins'}}
+            )
+        );
     };
 
     this.afterScoring = function (winSide) {

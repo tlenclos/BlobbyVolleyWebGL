@@ -38,3 +38,18 @@ canvas {
 .screen li a {
     text-decoration: none;
 }
+
+#flashMessage {
+    z-index: 100;
+    opacity: 0.8;
+    display: none;
+    background: #eeeeee;
+    color: black;
+    border: 2px solid black;
+    width: 300px;
+    padding: 10px;
+    position:absolute;
+    left: 50%;
+    margin-left: -150px;
+    bottom: 20px;
+}

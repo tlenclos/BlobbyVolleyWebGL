@@ -7,11 +7,21 @@ var screens = {
     "gameOverMenu": document.getElementById("gameOverMenu"),
     "optionsMenu": document.getElementById("optionsMenu")
 };
-var screenManager = new ScreenManager(screens);
+var screenManager = new ScreenManager(
+    screens,
+    document.getElementById("flashMessage"),
+    document.getElementById("flashText")
+);
 
 // Bootstrap
 init();
 screenManager.goTo("mainMenu");
+
+window.addEventListener("endGame", function(e) {
+    screenManager.displayFlashMessage(e.detail.message);
+    pauseGame();
+    screenManager.goTo("gameOverMenu");
+});
 
 // Init game
 function init() {
@@ -35,6 +45,7 @@ function init() {
 
 function newParty() {
     screenManager.hide();
+    screenManager.displayFlashMessage("Game starts !");
 
     // Party
     party = new Party(
