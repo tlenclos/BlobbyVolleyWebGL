@@ -2,7 +2,7 @@ function Rules (config) {
     // Properties
     this.config = {
         maximumContactsAllowed: 3,
-        scoreToWin: 21
+        scoreToWin: 25
     };
 
     // Methods

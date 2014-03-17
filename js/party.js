@@ -10,6 +10,7 @@ function Party (scene, rules, playersConfig) {
     this.scores = null;
     this.paused = false;
     this.playingSide = null;
+    this.servingSide = null;
 
     // Methods
     this.init = function () {
@@ -72,6 +73,9 @@ function Party (scene, rules, playersConfig) {
         // Ball
         this.ball = new Ball(this.physics.getWorld(), 0xff000, [-5, 5]);
 
+        // Serving side
+        this.servingSide = 'left';
+
         // Add all meshes to the scene
         var meshes = _.union(
             this.field.getWalls(),
@@ -91,16 +95,24 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.afterScoring = function (winSide) {
-        this.incrementScore(winSide);
+        if (winSide === this.servingSide) {
+            this.incrementScore(winSide);
 
-        // TODO Display score
+            // TODO Display score
+
+            // End of game
+            var maxScore = _.max(this.scores),
+                minScore = _.min(this.scores)
+            ;
+
+            if (maxScore >= this.rules.config.scoreToWin && maxScore - minScore > 1) {
+                this.endGame();
+            }
+        } else {
+            this.servingSide = winSide;
+        }
 
         // TODO Reset objects
-
-        // End of game
-        if (_.max(this.scores) >= this.rules.config.scoreToWin) {
-            this.endGame();
-        }
     };
 
     this.pause = function (pause) {
