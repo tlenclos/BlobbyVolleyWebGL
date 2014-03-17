@@ -43,6 +43,11 @@ function Party (scene, rules, playersConfig) {
         // Reset score
         this.resetScore();
 
+        // Lightning
+        // TODO Better lightning
+        light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+        scene.add(light);
+
         // Physics
         this.physics = new Physics(10);
 
