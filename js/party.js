@@ -86,6 +86,10 @@ function Party (scene, rules, playersConfig) {
         for (var i in meshes) {
             this.scene.add(meshes[i]);
         }
+
+        if (this.paused) {
+            this.pause(false);
+        }
     };
 
     this.endGame = function () {
