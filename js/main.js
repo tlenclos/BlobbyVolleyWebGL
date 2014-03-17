@@ -90,6 +90,11 @@ function pauseGame() {
     }
 }
 
+function startGame() {
+    screenManager.hide();
+    party.newGame();
+}
+
 // Animate and Render the 3D Scene
 function render(time) {
     // Sync physics with time
