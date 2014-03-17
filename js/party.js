@@ -126,6 +126,7 @@ function Party (scene, rules, playersConfig) {
 
     this.pause = function (pause) {
         this.paused = !_.isUndefined(pause) ? Boolean(pause) : !this.paused;
+        return this.paused;
     }
 
     this.update = function () {

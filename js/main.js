@@ -1,10 +1,17 @@
 // Variables
 var camera, scene, renderer, stats, container, oldTime, dt = 1 / 60;
 var party;
+var screens = {
+    "mainMenu": document.getElementById("mainMenu"),
+    "pauseMenu": document.getElementById("pauseMenu"),
+    "gameOverMenu": document.getElementById("gameOverMenu"),
+    "optionsMenu": document.getElementById("optionsMenu")
+};
+var screenManager = new ScreenManager(screens);
 
 // Bootstrap
 init();
-render();
+screenManager.goTo("mainMenu");
 
 // Init game
 function init() {
@@ -24,6 +31,10 @@ function init() {
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.top = '0px';
     container.appendChild(stats.domElement);
+}
+
+function newParty() {
+    screenManager.hide();
 
     // Party
     party = new Party(
@@ -51,9 +62,21 @@ function init() {
     // Pause party (space bar)
     document.addEventListener('keyup', function (event) {
         if (event.keyCode === 32) {
-            party.pause();
+            pauseGame();
         }
     });
+
+    render();
+}
+
+function pauseGame() {
+    var pauseState = party.pause();
+
+    if (pauseState) {
+        screenManager.goTo("pauseMenu");
+    } else {
+        screenManager.hide();
+    }
 }
 
 // Animate and Render the 3D Scene
