@@ -4,20 +4,20 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" media="screen" />
     </head>
     <body>
-        <div id="flashMessage">
+        <div id="flashMessage" class="depthBox">
             <p id="flashText"></p>
         </div>
 
-        <div class="screen" id="mainMenu">
-            <p>Welcome to Blobby Volley WebGL</p>
+        <div class="screen depthBox" id="mainMenu">
+            <h2>Welcome to Blobby Volley WebGL</h2>
             <ul>
                 <li><a href="javascript:newParty()">Play</a></li>
                 <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
             </ul>
         </div>
 
-        <div class="screen" id="pauseMenu">
-            <p>Game is paused</p>
+        <div class="screen depthBox" id="pauseMenu">
+            <h2>Game is paused</h2>
             <ul>
                 <li><a href="javascript:pauseGame()">Resure</a></li>
                 <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
@@ -25,16 +25,17 @@
             </ul>
         </div>
 
-        <div class="screen" id="gameOverMenu">
-            <p id="gameOverMsg"></p>
+        <div class="screen depthBox" id="gameOverMenu">
+            <h2 id="gameOverMsg">Game is paused</h2>
             <ul>
                 <li><a href="javascript:startGame()">Start a new game</a></li>
             </ul>
         </div>
 
-        <div class="screen" id="optionsMenu">
-            <p><a href="javascript:screenManager.goBack()">< Back</a> - Options</p>
+        <div class="screen depthBox" id="optionsMenu">
+            <h2>Options</h2>
             <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
             </ul>
         </div>
 
