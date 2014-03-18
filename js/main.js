@@ -1,30 +1,32 @@
 // Variables
-var camera, scene, renderer, stats, container, oldTime, dt = 1 / 60;
-var party;
-var screens = {
-    "mainMenu": document.getElementById("mainMenu"),
-    "pauseMenu": document.getElementById("pauseMenu"),
-    "gameOverMenu": document.getElementById("gameOverMenu"),
-    "optionsMenu": document.getElementById("optionsMenu")
-};
-var screenManager = new ScreenManager(
-    screens,
-    document.getElementById("flashMessage"),
-    document.getElementById("flashText")
-);
+var camera, scene, renderer, stats, container, oldTime, dt,
+    party,
+    screens = {
+        "mainMenu": document.getElementById("mainMenu"),
+        "pauseMenu": document.getElementById("pauseMenu"),
+        "gameOverMenu": document.getElementById("gameOverMenu"),
+        "optionsMenu": document.getElementById("optionsMenu")
+    },
+    screenManager = new ScreenManager(
+        screens,
+        document.getElementById("flashMessage"),
+        document.getElementById("flashText")
+    ),
+    request,
+    initialized = false
+;
 
 // Bootstrap
 init();
-screenManager.goTo("mainMenu");
-
-window.addEventListener("endGame", function(e) {
-    screenManager.displayFlashMessage(e.detail.message);
-    pauseGame();
-    screenManager.goTo("gameOverMenu");
-});
 
 // Init game
 function init() {
+    if (initialized) {
+        return;
+    }
+
+    initialized = true;
+
     // Scene
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -32,6 +34,9 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container = document.body;
     container.appendChild(renderer.domElement);
+
+    // Camera default position
+    camera.position.set(0, 0, 12);
 
     // Window resizing
     THREEx.WindowResize(renderer, camera);
@@ -41,6 +46,23 @@ function init() {
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.top = '0px';
     container.appendChild(stats.domElement);
+
+    // Pause party (space bar)
+    document.addEventListener('keyup', function (event) {
+        if (event.keyCode === 32) {
+            pauseGame();
+        }
+    });
+
+    // End game event listener
+    window.addEventListener("endGame", function(e) {
+        screenManager.displayFlashMessage(e.detail.message);
+        pauseGame();
+        screenManager.goTo("gameOverMenu");
+    });
+
+    // Display main menu
+    screenManager.goTo("mainMenu");
 }
 
 function newParty() {
@@ -66,17 +88,6 @@ function newParty() {
     );
     party.newGame();
 
-    // Camera default position
-    camera.position.y = 0;
-    camera.position.z = 12;
-
-    // Pause party (space bar)
-    document.addEventListener('keyup', function (event) {
-        if (event.keyCode === 32) {
-            pauseGame();
-        }
-    });
-
     render();
 }
 
@@ -90,23 +101,29 @@ function pauseGame() {
     }
 }
 
-function startGame() {
-    screenManager.hide();
-    party.newGame();
-}
-
-// Animate and Render the 3D Scene
-function render(time) {
+// Animation loop
+function renderLoop(time) {
     // Sync physics with time
     dt = ((time - oldTime) / 1000) || dt;
     oldTime = time;
 
     party.update();
 
-    requestAnimationFrame(render);
+    request = requestAnimationFrame(renderLoop);
 
     // update the stats
     stats.update();
 
     renderer.render(scene, camera);
+}
+
+// Launch animation
+function render() {
+    if (!_.isUndefined(request)) {
+        cancelAnimationFrame(request);
+    }
+
+    dt = 1 / 60;
+
+    renderLoop();
 }
