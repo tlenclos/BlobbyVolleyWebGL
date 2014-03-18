@@ -85,8 +85,8 @@ function Field (world, x, y, width, height) {
         body.CreateFixture(fixDef);
 
         var geometry = width > height
-            ? new THREE.CubeGeometry(width, height * 2, 0)
-            : new THREE.CubeGeometry(width * 2, height, 0)
+            ? new THREE.BoxGeometry(width, height * 2, 0)
+            : new THREE.BoxGeometry(width * 2, height, 0)
         ;
 
         var material;
