@@ -31,6 +31,7 @@ canvas {
 }
 
 .screen {
+    z-index: 200;
     display: none;
     background-color: #ddd;
     opacity: 0.8;
@@ -128,4 +129,27 @@ canvas {
     -ms-transform: scale(1);
     transform: scale(1);
     opacity: 1;
+}
+
+#score {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border-bottom: solid 10px #138F1B;
+    border-left: solid 10px #0F5713;
+    padding: 0 10px;
+    background: #eeeeee;
+}
+
+.left {
+    color: #ff0000;
+}
+
+.right {
+    color: #0000ff;
+}
+
+#scoreLeftDisplay, #scoreRightDisplay, #serviceDisplay, #scoreNeededToWinDisplay, #maximumContactsAllowedDisplay {
+    font-weight: bold;
+    font-size: 18px;
 }

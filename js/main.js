@@ -13,7 +13,12 @@ var camera, scene, renderer, stats, container, oldTime, dt,
         document.getElementById("flashText")
     ),
     request,
-    initialized = false
+    initialized = false,
+    scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
+    scoreRightDisplay = document.getElementById("scoreRightDisplay"),
+    serviceDisplay = document.getElementById("serviceDisplay"),
+    scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay")
+    maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay")
 ;
 
 // Bootstrap
@@ -60,8 +65,12 @@ function init() {
     window.addEventListener("endGame", function(e) {
         screenManager.displayFlashMessage(e.detail.message);
         pauseGame();
+
         screenManager.goTo("gameOverMenu");
     });
+
+    // Score event listener
+    window.addEventListener("score", updateScoreUI);
 
     // Display main menu
     screenManager.goTo("mainMenu");
@@ -70,11 +79,16 @@ function init() {
 function newParty() {
     screenManager.hide();
     screenManager.displayFlashMessage("Game starts !");
+    resetScoreUI();
+
+    // Rules
+    var rules = new Rules();
+    updateRulesUI(rules);
 
     // Party
     party = new Party(
         scene,
-        new Rules(),
+        rules,
         [
             {
                 name: 'P1',
@@ -101,6 +115,38 @@ function pauseGame() {
     } else {
         screenManager.hide();
     }
+}
+
+function updateRulesUI(rules) {
+    scoreNeededToWinDisplay.textContent = rules.config.scoreToWin;
+    maximumContactsAllowedDisplay.textContent = rules.config.maximumContactsAllowed;
+}
+
+function updateScoreUI(event) {
+    var
+        winSide = event.detail.side,
+        scored = event.detail.scored,
+        scoreDisplay
+    ;
+
+    if (winSide == "left") {
+        scoreDisplay = scoreLeftDisplay;
+    } else {
+        scoreDisplay = scoreRightDisplay;
+    }
+
+    if (scored) {
+        scoreDisplay.textContent = parseInt(scoreDisplay.textContent)+1;
+    } else {
+        serviceDisplay.className = winSide;
+        serviceDisplay.textContent = winSide.charAt(0).toUpperCase() + winSide.slice(1);
+    }
+}
+
+function resetScoreUI() {
+    scoreLeftDisplay.textContent = 0;
+    scoreRightDisplay.textContent = 0;
+    serviceDisplay.textContent = "Left";
 }
 
 // Animation loop

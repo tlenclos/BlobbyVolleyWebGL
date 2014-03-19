@@ -107,10 +107,11 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.afterScoring = function (winSide) {
+        var scored = false;
+
         if (winSide === this.servingSide) {
             this.incrementScore(winSide);
-
-            // TODO Display score
+            scored = true;
 
             // End of game
             var maxScore = _.max(this.scores),
@@ -123,6 +124,14 @@ function Party (scene, rules, playersConfig) {
         } else {
             this.servingSide = winSide;
         }
+
+        // Dispatch score event
+        window.dispatchEvent(
+            new CustomEvent(
+                'score',
+                {detail: {side: winSide, scored: scored}}
+            )
+        );
 
         // TODO Reset objects
     };

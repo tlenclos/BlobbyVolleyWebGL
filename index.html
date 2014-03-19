@@ -4,6 +4,13 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" media="screen" />
     </head>
     <body>
+        <div id="score">
+            <p>Score: <span id="scoreLeftDisplay" class="left">0</span> | <span id="scoreRightDisplay" class="right">0</span></p>
+            <p>Service: <span id="serviceDisplay" class="left">Left</span></p>
+            <p>Win at <span id="scoreNeededToWinDisplay"></span></p>
+            <p>Contacts allowed <span id="maximumContactsAllowedDisplay"></span></p>
+        </div>
+
         <div id="flashMessage" class="depthBox">
             <p id="flashText"></p>
         </div>
@@ -26,7 +33,7 @@
         </div>
 
         <div class="screen depthBox" id="gameOverMenu">
-            <h2 id="gameOverMsg">Game is paused</h2>
+            <h2 id="gameOverMsg">Game over</h2>
             <ul>
                 <li><a href="javascript:newParty()">Start a new game</a></li>
             </ul>
