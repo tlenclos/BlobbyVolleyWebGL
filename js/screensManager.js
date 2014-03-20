@@ -24,27 +24,33 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
     };
 
     // Methods
-    this.goTo = function (scene) {
-        if (_.isUndefined(this.screens[scene])) {
-            throw "Scene does not exist";
-        }
-
-        this.history.push(scene);
-        var screen = this.screens[scene];
-
-        this.hide();
-        screen.style.display = 'block';
+    this.goTo = function (screen) {
+        this.displayScreen(screen);
+        this.history.push(screen);
     };
 
     this.goBack = function() {
         var index = this.history.length-2;
+
         if (index >= 0) {
             var previousScreen = this.history[index];
             if (previousScreen) {
-                this.goTo(previousScreen);
+                this.displayScreen(previousScreen);
+                this.history.pop();
             }
         }
-    }
+    };
+
+    this.displayScreen = function(screen) {
+        if (_.isUndefined(this.screens[screen])) {
+            throw "Screen does not exist";
+        }
+
+        var screen = this.screens[screen];
+
+        this.hide();
+        screen.style.display = 'block';
+    };
 
     this.hide = function() {
         _.each(this.screens, function(item) {
