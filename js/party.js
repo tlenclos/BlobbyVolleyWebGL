@@ -11,6 +11,7 @@ function Party (scene, rules, playersConfig) {
     this.paused = false;
     this.playingSide = null;
     this.servingSide = null;
+    this.inProgress = null;
 
     // Methods
     this.init = function () {
@@ -95,9 +96,13 @@ function Party (scene, rules, playersConfig) {
         if (this.paused) {
             this.pause(false);
         }
+
+        this.inProgress = true;
     };
 
     this.endGame = function () {
+        this.inProgress = false;
+
         window.dispatchEvent(
             new CustomEvent(
                 'endGame',
@@ -142,7 +147,7 @@ function Party (scene, rules, playersConfig) {
     }
 
     this.update = function () {
-        if (this.paused) {
+        if (this.paused || !this.inProgress) {
             return;
         }
 

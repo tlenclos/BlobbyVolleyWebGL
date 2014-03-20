@@ -108,6 +108,9 @@ function newParty() {
 }
 
 function pauseGame() {
+    if (!party.inProgress)
+        return;
+
     var pauseState = party.pause();
 
     if (pauseState) {
