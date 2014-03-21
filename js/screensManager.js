@@ -4,6 +4,7 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
     this.history = [];
     this.flashMessageElement = flashMessageElement;
     this.flashMessageTextElement = flashMessageTextElement;
+    this.listeners = {};
 
     // Methods
     this.init = function () {
@@ -23,7 +24,6 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
         this.screens = screens;
     };
 
-    // Methods
     this.goTo = function (screen) {
         this.displayScreen(screen);
         this.history.push(screen);
@@ -46,6 +46,7 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
             throw "Screen does not exist";
         }
 
+        this.dispatch(screen);
         var screen = this.screens[screen];
 
         this.hide();
@@ -101,6 +102,22 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
 
         tick();
     }
+
+    this.on = function(eventName, listener) {
+        if (!this.listeners[eventName]) {
+            this.listeners[eventName] = [];
+        }
+
+        this.listeners[eventName].push(listener);
+    },
+
+    this.dispatch = function(eventName) {
+        if (this.listeners[eventName]) {
+            for(var i=0; i<this.listeners[eventName].length; i++) {
+                this.listeners[eventName][i](this);
+            }
+        }
+    },
 
     this.init();
 }

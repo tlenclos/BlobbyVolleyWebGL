@@ -153,3 +153,28 @@ canvas {
     font-weight: bold;
     font-size: 18px;
 }
+
+/* Controls screen */
+.playerControl {
+    float: left;
+    width: 50%;
+}
+
+.playerControl p {
+    text-align: left;
+    padding: 0 0 0 5px;
+}
+
+#leftControls {
+    border-top: 5px solid #ff0000;
+}
+
+#rightControls {
+    border-top: 5px solid #0000ff;
+}
+
+input.controlKey {
+    width: 70px;
+    float: right;
+    margin-right: 50px;
+}

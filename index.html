@@ -43,7 +43,25 @@
             <h2>Options</h2>
             <ul>
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
+                <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
             </ul>
+        </div>
+
+        <div class="screen depthBox" id="controlsMenu">
+            <h2>Controls</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <div id="leftControls" class="playerControl">
+                <p>Move left <input type="text" class="controlKey" data-player="0" data-control="left" /></p>
+                <p>Move right <input type="text" class="controlKey" data-player="0" data-control="right" /></p>
+                <p>Jump <input type="text" class="controlKey" data-player="0" data-control="up" /></p>
+            </div>
+            <div id="rightControls" class="playerControl">
+                <p>Move left <input type="text" class="controlKey" data-player="1" data-control="left" /></span></p>
+                <p>Move right <input type="text" class="controlKey" data-player="1" data-control="right" /></span></p>
+                <p>Jump <input type="text" class="controlKey" data-player="1" data-control="up" /></p>
+            </div>
         </div>
 
         <script src="js/libs/underscore.js"></script>
@@ -52,6 +70,7 @@
         <script src="js/libs/THREEx.KeyboardState.js"></script>
         <script src="js/libs/stats.min.js"></script>
         <script src="js/libs/Box2dWeb-2.1.a.3.js"></script>
+        <script src="js/libs/keycodeDictionary.js"></script>
         <script src="js/sound.js"></script>
         <script src="js/physics.js"></script>
         <script src="js/field.js"></script>

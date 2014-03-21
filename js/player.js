@@ -1,21 +1,33 @@
 function Player (name, controls, side) {
     // Properties
     this.name = name;
-    this.controls = {
-        'up': controls[0],
-        'right': controls[1],
-        'left': controls[2]
-    };
+    this.controls = controls;
     this.side = null;
     this.keyboard = null;
     this.blob = null;
     this.currentTouches = null;
+    var self = this;
 
     // Methods
     this.init = function () {
         this.side = side;
         this.keyboard = new THREEx.KeyboardState();
         this.currentTouches = 0;
+    };
+
+    this.setControls = function(controls) {
+        _.each(controls, function(value, key) {
+            self.setControlForKey(key, value);
+        });
+    };
+
+    this.setControlForKey = function(key, keyBinding) {
+
+        if (_.isUndefined(this.controls[key])) {
+            throw "This control does not exist";
+        }
+
+        this.controls[key] = keyBinding;
     };
 
     this.getControlsAntagonistKey = function (key) {

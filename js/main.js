@@ -5,7 +5,8 @@ var camera, scene, renderer, stats, container, oldTime, dt,
         "mainMenu": document.getElementById("mainMenu"),
         "pauseMenu": document.getElementById("pauseMenu"),
         "gameOverMenu": document.getElementById("gameOverMenu"),
-        "optionsMenu": document.getElementById("optionsMenu")
+        "optionsMenu": document.getElementById("optionsMenu"),
+        "controlsMenu": document.getElementById("controlsMenu")
     },
     screenManager = new ScreenManager(
         screens,
@@ -18,7 +19,20 @@ var camera, scene, renderer, stats, container, oldTime, dt,
     scoreRightDisplay = document.getElementById("scoreRightDisplay"),
     serviceDisplay = document.getElementById("serviceDisplay"),
     scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay")
-    maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay")
+    maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
+    controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
+    playerControls = [
+        {
+            'up': 'z',
+            'right': 'd',
+            'left': 'q'
+        },
+        {
+            'up': 'up',
+            'right': 'right',
+            'left': 'left'
+        }
+    ]
 ;
 
 // Bootstrap
@@ -61,6 +75,7 @@ function init() {
         }
     });
 
+    /* Events */
     // End game event listener
     window.addEventListener("endGame", function(e) {
         screenManager.displayFlashMessage(e.detail.message);
@@ -71,6 +86,39 @@ function init() {
 
     // Score event listener
     window.addEventListener("score", updateScoreUI);
+
+    // Control menu is displayed, listen keyboard event on inputs
+    screenManager.on("controlsMenu", function() {
+        var keydownOnInputControl = function(e) {
+            var input = e.srcElement;
+            var player = parseInt(input.getAttribute('data-player'));
+            var controlName = input.getAttribute('data-control');
+            var keyTextValue = keycodeDictionary[e.keyCode];
+
+            input.value = keyTextValue;
+
+            // TODO handle control configuration before the party is initialized
+            playerControls[player][controlName] = keyTextValue;
+
+            if (party) {
+                var control = {};
+                control[controlName] = keyTextValue;
+                party.players[player].setControls(control)
+            }
+
+            return false;
+        };
+
+        _.each(controlsElements, function(item) {
+            var player = parseInt(item.getAttribute('data-player'));
+            var controlName = item.getAttribute('data-control');
+            item.value = playerControls[player][controlName];
+
+            if (_.isNull(item.onkeydown)) {
+                item.onkeydown = keydownOnInputControl;
+            }
+        });
+    });
 
     // Display main menu
     screenManager.goTo("mainMenu");
@@ -92,12 +140,12 @@ function newParty() {
         [
             {
                 name: 'P1',
-                controls: ['z', 'd', 'q'],
+                controls: playerControls[0],
                 position: 'left'
             },
             {
                 name: 'P2',
-                controls: ['up', 'right', 'left'],
+                controls: playerControls[1],
                 position: 'right'
             }
         ]
