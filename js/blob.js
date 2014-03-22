@@ -129,5 +129,10 @@ function Blob (world, color, spawnPosition) {
         this.threeObject.position.y = pos.y;
     };
 
+    this.moveTo = function (position) {
+        this.fixture.GetBody().SetPosition(new b2Vec2(position[0], position[1]));
+        this.fixture.GetBody().SetLinearVelocity(new b2Vec2(0, 0));
+    };
+
     this.init();
 }
