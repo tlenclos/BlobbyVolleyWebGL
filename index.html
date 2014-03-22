@@ -44,6 +44,7 @@
             <ul>
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
                 <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
+                <li><a href="javascript:screenManager.goTo('rulesMenu')">Rules</a></li>
             </ul>
         </div>
 
@@ -62,6 +63,16 @@
                 <p>Move right <input type="text" class="controlKey" data-player="1" data-control="right" /></span></p>
                 <p>Jump <input type="text" class="controlKey" data-player="1" data-control="up" /></p>
             </div>
+        </div>
+
+        <div class="screen depthBox" id="rulesMenu">
+            <h2>Rules</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <p><strong>Rules will be applied next game.</strong></p>
+            <p>Maximum contacts allowed <input type="text" class="ruleElement" data-ruleName="maximumContactsAllowed" /></p>
+            <p>Score to win <input type="text" class="ruleElement" data-ruleName="scoreToWin"/></p>
         </div>
 
         <script src="js/libs/underscore.js"></script>

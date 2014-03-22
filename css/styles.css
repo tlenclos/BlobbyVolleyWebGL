@@ -178,3 +178,13 @@ input.controlKey {
     float: right;
     margin-right: 50px;
 }
+
+/* Rules screen */
+#rulesMenu p {
+    text-align: left;
+}
+
+#rulesMenu input {
+    width: 50px;
+    float: right;
+}

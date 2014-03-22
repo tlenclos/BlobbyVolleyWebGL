@@ -6,7 +6,8 @@ var camera, scene, renderer, stats, container, oldTime, dt,
         "pauseMenu": document.getElementById("pauseMenu"),
         "gameOverMenu": document.getElementById("gameOverMenu"),
         "optionsMenu": document.getElementById("optionsMenu"),
-        "controlsMenu": document.getElementById("controlsMenu")
+        "controlsMenu": document.getElementById("controlsMenu"),
+        "rulesMenu": document.getElementById("rulesMenu"),
     },
     screenManager = new ScreenManager(
         screens,
@@ -21,7 +22,8 @@ var camera, scene, renderer, stats, container, oldTime, dt,
     scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay")
     maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
-    playerControls = [
+    rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement');
+    initPlayerControls = [
         {
             'up': 'z',
             'right': 'd',
@@ -32,7 +34,8 @@ var camera, scene, renderer, stats, container, oldTime, dt,
             'right': 'right',
             'left': 'left'
         }
-    ]
+    ],
+    rules = new Rules()
 ;
 
 // Bootstrap
@@ -98,7 +101,7 @@ function init() {
             input.value = keyTextValue;
 
             // TODO handle control configuration before the party is initialized
-            playerControls[player][controlName] = keyTextValue;
+            initPlayerControls[player][controlName] = keyTextValue;
 
             if (party) {
                 var control = {};
@@ -112,10 +115,30 @@ function init() {
         _.each(controlsElements, function(item) {
             var player = parseInt(item.getAttribute('data-player'));
             var controlName = item.getAttribute('data-control');
-            item.value = playerControls[player][controlName];
+            item.value = initPlayerControls[player][controlName];
 
             if (_.isNull(item.onkeydown)) {
                 item.onkeydown = keydownOnInputControl;
+            }
+        });
+    });
+
+    // Rules menu is displayed, listen keyboard event on inputs
+    screenManager.on("rulesMenu", function() {
+        var keydownOnInputControl = function(e) {
+            var input = e.srcElement;
+            var ruleValue = parseInt(input.value);
+            var ruleName = input.getAttribute('data-ruleName');
+            rules.config[ruleName] = ruleValue;
+            input.value = ruleValue;
+        };
+
+        _.each(rulesElements, function(item) {
+            var ruleName = item.getAttribute('data-ruleName');
+            item.value = rules.config[ruleName];
+
+            if (_.isNull(item.onkeyup)) {
+                item.onkeyup = keydownOnInputControl;
             }
         });
     });
@@ -129,8 +152,6 @@ function newParty() {
     screenManager.displayFlashMessage("Game starts !");
     resetScoreUI();
 
-    // Rules
-    var rules = new Rules();
     updateRulesUI(rules);
 
     // Party
@@ -140,12 +161,12 @@ function newParty() {
         [
             {
                 name: 'P1',
-                controls: playerControls[0],
+                controls: initPlayerControls[0],
                 position: 'left'
             },
             {
                 name: 'P2',
-                controls: playerControls[1],
+                controls: initPlayerControls[1],
                 position: 'right'
             }
         ]
