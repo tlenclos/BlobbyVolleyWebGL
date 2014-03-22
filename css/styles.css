@@ -113,7 +113,7 @@ canvas {
     opacity: 0;
 }
 
-.screen li a:hover {
+.screen li a:hover, .screen li a:focus {
     background: rgba(255, 255, 255, 1);
     color: #41ab6b;
 }
@@ -123,7 +123,7 @@ canvas {
     -ms-transform: scale(1.2);
     transform: scale(1.2);
 }
-.screen li a:hover:after {
+.screen li a:hover:after, .screen li a:focus:after {
     -webkit-transform: scale(1);
     -moz-transform: scale(1);
     -ms-transform: scale(1);
