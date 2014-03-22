@@ -9,6 +9,7 @@ function Party (scene, rules, playersConfig) {
     this.ball = null;
     this.scores = null;
     this.paused = false;
+    this.lockPause = false;
     this.playingSide = null;
     this.servingSide = null;
     this.inProgress = null;
@@ -75,7 +76,7 @@ function Party (scene, rules, playersConfig) {
                 player
             ;
 
-            position = [playerConfig.position === 'left' ? -5 : 5, 0];
+            position = [playerConfig.position === 'left' ? -5 : 5, -4];
             color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
 
             blob = new Blob(this.physics.getWorld(), color, position);
@@ -123,11 +124,12 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.afterScoring = function (winSide) {
-        var scored = false;
+        // Internal pause
+        this.pause(true);
+        this.lockPause = true;
 
         if (winSide === this.servingSide) {
             this.incrementScore(winSide);
-            scored = true;
 
             // End of game
             var maxScore = _.max(this.scores),
@@ -136,23 +138,32 @@ function Party (scene, rules, playersConfig) {
 
             if (maxScore >= this.rules.config.scoreToWin && maxScore - minScore > 1) {
                 this.endGame();
+                return;
             }
         } else {
             this.servingSide = winSide;
         }
 
-        // Dispatch score event
-        window.dispatchEvent(
-            new CustomEvent(
-                'score',
-                {detail: {side: winSide, scored: scored}}
-            )
-        );
+        // Reset objects
+        this.ball.moveTo([winSide === 'left' ? -5 : 5, 5]);
 
-        // TODO Reset objects
+        _.each(this.players, function (player) {
+            player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
+        });
+
+        var self = this;
+
+        _.delay(function () {
+            self.lockPause = false;
+            self.pause(false);
+        }, 1000);
     };
 
     this.pause = function (pause) {
+        if (this.lockPause) {
+            throw 'Pause is locked';
+        }
+
         this.paused = !_.isUndefined(pause) ? Boolean(pause) : !this.paused;
         return this.paused;
     }
@@ -221,6 +232,14 @@ function Party (scene, rules, playersConfig) {
 
     this.incrementScore = function (side) {
         this.scores[side]++;
+
+        // Dispatch score event
+        window.dispatchEvent(
+            new CustomEvent(
+                'score',
+                {detail: {side: side, scored: true}}
+            )
+        );
     }
 
     this.init();
