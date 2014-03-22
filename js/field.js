@@ -24,8 +24,10 @@ function Field (world, x, y, width, height) {
             null,
             2,
             null,
-            null,
-            'type_ground'
+            THREE.ImageUtils.loadTexture('textures/wood.jpg'),
+            'type_ground',
+            20,
+            0xeeeeee
         );
 
         leftWall = this.createWall(
@@ -34,6 +36,12 @@ function Field (world, x, y, width, height) {
             0.5,
             height * 2,
             null,
+            0,
+            null,
+            null,
+            null,
+            20,
+            0xDEDEDE,
             0
         );
 
@@ -43,22 +51,34 @@ function Field (world, x, y, width, height) {
             0.5,
             height * 2,
             null,
+            0,
+            null,
+            null,
+            null,
+            20,
+            0xDEDEDE,
             0
         );
 
         net = this.createWall(
             x,
             y - (height / 2) + (height / 4),
-            0.25,
+            0.15,
             height / 2,
             null,
-            0
+            0,
+            null,
+            null,
+            null,
+            20,
+            0xDEDEDE,
+            0.8
         );
 
         this.walls.push(ground, leftWall, rightWall, net);
     };
 
-    this.createWall = function (x, y, width, height, density, friction, restitution, texture, userData) {
+    this.createWall = function (x, y, width, height, density, friction, restitution, texture, userData, depth, color, opacity) {
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
@@ -85,8 +105,8 @@ function Field (world, x, y, width, height) {
         body.CreateFixture(fixDef);
 
         var geometry = width > height
-            ? new THREE.BoxGeometry(width, height * 2, 0)
-            : new THREE.BoxGeometry(width * 2, height, 0)
+            ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
+            : new THREE.BoxGeometry(width * 2, height, _.isNumber(depth) ? depth : 0)
         ;
 
         var material;
@@ -98,7 +118,9 @@ function Field (world, x, y, width, height) {
             });
         } else {
             material = new THREE.MeshBasicMaterial({
-                color: 0x000000
+                color: !_.isUndefined(color) ? color : 0x000000,
+                opacity: !_.isUndefined(opacity) ? opacity : 1,
+                transparent: true
             });
         }
 

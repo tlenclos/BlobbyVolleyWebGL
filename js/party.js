@@ -44,6 +44,15 @@ function Party (scene, rules, playersConfig) {
         // Reset score
         this.resetScore();
 
+        // Background
+        var bg = new THREE.Mesh(
+          new THREE.PlaneGeometry(110, 90, 0),
+          new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/background.jpg')})
+        );
+
+        bg.position.z = -20;
+        bg.position.y = 12;
+
         // Lightning
         // TODO Better lightning
         light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -92,6 +101,8 @@ function Party (scene, rules, playersConfig) {
         for (var i in meshes) {
             this.scene.add(meshes[i]);
         }
+
+        this.scene.add(bg);
 
         if (this.paused) {
             this.pause(false);
