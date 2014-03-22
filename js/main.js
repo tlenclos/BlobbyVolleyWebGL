@@ -35,7 +35,8 @@ var camera, scene, renderer, stats, container, oldTime, dt,
             'left': 'left'
         }
     ],
-    rules = new Rules()
+    rules = new Rules(),
+    debug = false
 ;
 
 // Bootstrap
@@ -60,7 +61,13 @@ function init() {
     container.appendChild(renderer.domElement);
 
     // Camera default position
-    camera.position.set(0, 0, 12);
+    camera.position.set(0, 4, 12);
+    camera.rotation.x = -5 * Math.PI / 180;
+
+    if (debug) {
+        var controls = new THREE.OrbitControls( camera );
+        controls.addEventListener( 'change', render );
+    }
 
     // Window resizing
     THREEx.WindowResize(renderer, camera);
