@@ -152,7 +152,6 @@ function init() {
 
     // Display main menu
     screenManager.goTo("mainMenu");
-    newParty();
 }
 
 function newParty() {
