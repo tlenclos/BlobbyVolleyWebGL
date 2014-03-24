@@ -10,24 +10,25 @@ function Field (world, x, y, width, height) {
     this.world = world;
     this.position = { x: x, y: y };
     this.dims = [width, height];
-    this.walls = [];
+    this.parts = [];
 
     // Methods
     this.init = function () {
-        var ground, leftWall, rightWall, net;
+        var ground, leftWall, rightWall, net, bg;
 
         ground = this.createWall(
             x,
             y - (height / 2) - 0.5,
             width,
             0.5,
+            20,
             null,
             2,
             null,
             THREE.ImageUtils.loadTexture('textures/wood.jpg'),
-            'type_ground',
-            20,
-            0xeeeeee
+            0xEEEEEE,
+            null,
+            'type_ground'
         );
 
         leftWall = this.createWall(
@@ -35,12 +36,11 @@ function Field (world, x, y, width, height) {
             y + (height / 2),
             0.5,
             height * 2,
+            20,
             null,
             0,
             null,
             null,
-            null,
-            20,
             0xDEDEDE,
             0
         );
@@ -50,12 +50,11 @@ function Field (world, x, y, width, height) {
             y + (height / 2),
             0.5,
             height * 2,
+            20,
             null,
             0,
             null,
             null,
-            null,
-            20,
             0xDEDEDE,
             0
         );
@@ -65,20 +64,28 @@ function Field (world, x, y, width, height) {
             y - (height / 2) + (height / 4),
             0.15,
             height / 2,
+            20,
             null,
             0,
             null,
             null,
-            null,
-            20,
             0xDEDEDE,
             0.8
         );
 
-        this.walls.push(ground, leftWall, rightWall, net);
+        // Background
+        bg = new THREE.Mesh(
+            new THREE.PlaneGeometry(110, 90, 0),
+            new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/background.jpg')})
+        );
+
+        bg.position.z = -20;
+        bg.position.y = 12;
+
+        this.parts.push(ground, leftWall, rightWall, net, bg);
     };
 
-    this.createWall = function (x, y, width, height, density, friction, restitution, texture, userData, depth, color, opacity) {
+    this.createWall = function (x, y, width, height, depth, density, friction, restitution, texture, color, opacity, userData) {
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
@@ -146,8 +153,8 @@ function Field (world, x, y, width, height) {
         return this.dims;
     };
 
-    this.getWalls = function () {
-        return this.walls;
+    this.getParts = function () {
+        return this.parts;
     };
 
     this.init();
