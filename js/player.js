@@ -6,7 +6,6 @@ function Player (name, controls, side) {
     this.keyboard = null;
     this.blob = null;
     this.currentTouches = null;
-    var self = this;
 
     // Methods
     this.init = function () {
@@ -17,8 +16,8 @@ function Player (name, controls, side) {
 
     this.setControls = function(controls) {
         _.each(controls, function(value, key) {
-            self.setControlForKey(key, value);
-        });
+            this.setControlForKey(key, value);
+        }, this);
     };
 
     this.setControlForKey = function(key, keyBinding) {
