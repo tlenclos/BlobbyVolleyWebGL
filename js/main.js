@@ -7,7 +7,7 @@ var camera, scene, renderer, stats, container, oldTime, dt,
         "gameOverMenu": document.getElementById("gameOverMenu"),
         "optionsMenu": document.getElementById("optionsMenu"),
         "controlsMenu": document.getElementById("controlsMenu"),
-        "rulesMenu": document.getElementById("rulesMenu"),
+        "rulesMenu": document.getElementById("rulesMenu")
     },
     screenManager = new ScreenManager(
         screens,
