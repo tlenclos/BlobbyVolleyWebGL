@@ -19,10 +19,10 @@ var camera, scene, renderer, stats, container, oldTime, dt,
     scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
     scoreRightDisplay = document.getElementById("scoreRightDisplay"),
     serviceDisplay = document.getElementById("serviceDisplay"),
-    scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay")
+    scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay"),
     maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
-    rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement');
+    rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
     initPlayerControls = [
         {
             'up': 'z',
