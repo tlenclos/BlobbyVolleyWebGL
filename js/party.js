@@ -36,6 +36,14 @@ function Party (scene, rules, playersConfig) {
             left: 0,
             right: 0
         };
+
+        // Dispatch score event
+        window.dispatchEvent(
+            new CustomEvent(
+                'score',
+                {detail: {side: 'left', scores: this.scores}}
+            )
+        );
     };
 
     this.newGame = function () {
@@ -44,15 +52,6 @@ function Party (scene, rules, playersConfig) {
 
         // Reset score
         this.resetScore();
-
-        // Background
-        var bg = new THREE.Mesh(
-          new THREE.PlaneGeometry(110, 90, 0),
-          new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/background.jpg')})
-        );
-
-        bg.position.z = -20;
-        bg.position.y = 12;
 
         // Lightning
         // TODO Better lightning
@@ -94,7 +93,7 @@ function Party (scene, rules, playersConfig) {
 
         // Add all meshes to the scene
         var meshes = _.union(
-            this.field.getWalls(),
+            this.field.getParts(),
             _.map(this.players, function(player) { return player.getBlob().threeObject; }),
             this.ball.threeObject
         );
@@ -102,8 +101,6 @@ function Party (scene, rules, playersConfig) {
         for (var i in meshes) {
             this.scene.add(meshes[i]);
         }
-
-        this.scene.add(bg);
 
         if (this.paused) {
             this.pause(false);
@@ -124,6 +121,8 @@ function Party (scene, rules, playersConfig) {
     };
 
     this.afterScoring = function (winSide) {
+        var resetObjects = true;
+
         // Internal pause
         this.pause(true);
         this.lockPause = true;
@@ -138,25 +137,35 @@ function Party (scene, rules, playersConfig) {
 
             if (maxScore >= this.rules.config.scoreToWin && maxScore - minScore > 1) {
                 this.endGame();
-                return;
+                resetObjects = false;
             }
         } else {
             this.servingSide = winSide;
         }
 
-        // Reset objects
-        this.ball.moveTo([winSide === 'left' ? -5 : 5, 5]);
+        // Dispatch score event
+        window.dispatchEvent(
+            new CustomEvent(
+                'score',
+                {detail: {side: winSide, scores: this.scores}}
+            )
+        );
 
-        _.each(this.players, function (player) {
-            player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
-        });
+        if (resetObjects) {
+            // Reset objects
+            this.ball.moveTo([winSide === 'left' ? -5 : 5, 5]);
 
-        var self = this;
+            _.each(this.players, function (player) {
+                player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
+            });
 
-        _.delay(function () {
-            self.lockPause = false;
-            self.pause(false);
-        }, 1000);
+            var self = this;
+
+            _.delay(function () {
+                self.lockPause = false;
+                self.pause(false);
+            }, 1000);
+        }
     };
 
     this.pause = function (pause) {
@@ -232,15 +241,7 @@ function Party (scene, rules, playersConfig) {
 
     this.incrementScore = function (side) {
         this.scores[side]++;
-
-        // Dispatch score event
-        window.dispatchEvent(
-            new CustomEvent(
-                'score',
-                {detail: {side: side, scored: true}}
-            )
-        );
-    }
+    };
 
     this.init();
 }

@@ -7,7 +7,7 @@ var camera, scene, renderer, stats, container, oldTime, dt,
         "gameOverMenu": document.getElementById("gameOverMenu"),
         "optionsMenu": document.getElementById("optionsMenu"),
         "controlsMenu": document.getElementById("controlsMenu"),
-        "rulesMenu": document.getElementById("rulesMenu"),
+        "rulesMenu": document.getElementById("rulesMenu")
     },
     screenManager = new ScreenManager(
         screens,
@@ -157,7 +157,6 @@ function init() {
 function newParty() {
     screenManager.hide();
     screenManager.displayFlashMessage("Game starts !");
-    resetScoreUI();
 
     updateRulesUI(rules);
 
@@ -202,30 +201,14 @@ function updateRulesUI(rules) {
 }
 
 function updateScoreUI(event) {
-    var
-        winSide = event.detail.side,
-        scored = event.detail.scored,
-        scoreDisplay
+    var winSide = event.detail.side,
+        scores = event.detail.scores
     ;
 
-    if (winSide == "left") {
-        scoreDisplay = scoreLeftDisplay;
-    } else {
-        scoreDisplay = scoreRightDisplay;
-    }
-
-    if (scored) {
-        scoreDisplay.textContent = parseInt(scoreDisplay.textContent)+1;
-    } else {
-        serviceDisplay.className = winSide;
-        serviceDisplay.textContent = winSide.charAt(0).toUpperCase() + winSide.slice(1);
-    }
-}
-
-function resetScoreUI() {
-    scoreLeftDisplay.textContent = 0;
-    scoreRightDisplay.textContent = 0;
-    serviceDisplay.textContent = "Left";
+    scoreLeftDisplay.textContent = scores.left;
+    scoreRightDisplay.textContent = scores.right;
+    serviceDisplay.className = winSide;
+    serviceDisplay.textContent = winSide.charAt(0).toUpperCase() + winSide.slice(1);
 }
 
 // Animation loop
