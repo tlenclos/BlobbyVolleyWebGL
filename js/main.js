@@ -3,6 +3,7 @@ define(function (require) {
         Stats = require('Stats'),
         THREE = require('THREE'),
         THREExWindowResize = require('THREExWindowResize'),
+        AssetManager = require('./assetManager'),
         ScreenManager = require('./screensManager'),
         Party = require('./party'),
         Rules = require('./rules'),
@@ -12,6 +13,7 @@ define(function (require) {
     let camera, scene, renderer, stats, container, oldTime,
         party,
         screens = {
+            "loadingMenu": document.getElementById("loadingMenu"),
             "mainMenu": document.getElementById("mainMenu"),
             "pauseMenu": document.getElementById("pauseMenu"),
             "gameOverMenu": document.getElementById("gameOverMenu"),
@@ -24,6 +26,7 @@ define(function (require) {
             document.getElementById("flashMessage"),
             document.getElementById("flashText")
         ),
+        assetManager = new AssetManager(),
         request,
         initialized = false,
         scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
@@ -52,7 +55,7 @@ define(function (require) {
     // Bootstrap
     init();
 
-    // Init game
+    // Init
     function init() {
         if (initialized) {
             return;
@@ -60,6 +63,26 @@ define(function (require) {
 
         initialized = true;
 
+        // Load game
+        screenManager.goTo("loadingMenu");
+        loadGame();
+    }
+
+    // Load game
+    function loadGame () {
+        // Assets
+        assetManager.on('loaded', initGame);
+        assetManager.on('error', (component, error) => {
+            screenManager.getScreen('loadingMenu').classList.add('error');
+            throw error;
+        });
+        assetManager.loadTexture('textures/wood.jpg');
+        assetManager.loadTexture('textures/background.jpg');
+        assetManager.loadTexture('textures/ball.jpg');
+    }
+
+    // Init game
+    function initGame() {
         // Scene
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -252,4 +275,5 @@ define(function (require) {
     window.newParty = newParty;
     window.pauseGame = pauseGame;
     window.screenManager = screenManager;
+    window.assetManager = assetManager;
 });

@@ -1,6 +1,8 @@
-define(['lodash'], function (_) {
-    return class ScreenManager {
+define(['./eventEmitter', 'lodash'], function (EventEmitter, _) {
+    return class ScreenManager extends EventEmitter {
         constructor (screens, flashMessageElement, flashMessageTextElement) {
+            super();
+
             _.forEach(screens, function (item) {
                 if (!(item instanceof HTMLElement)) {
                     throw "Screen must be an instance of HTMLElement";
@@ -39,14 +41,18 @@ define(['lodash'], function (_) {
             }
         }
 
-        displayScreen (name) {
+        getScreen (name) {
             if (_.isUndefined(this.screens[name])) {
-                throw "Screen does not exist";
+                throw `Screen ${name} does not exist`;
             }
 
-            this.dispatch(name);
-            const screen = this.screens[name];
+            return this.screens[name];
+        }
 
+        displayScreen (name) {
+            const screen = this.getScreen(name);
+
+            this.dispatch(name);
             this.hide();
             screen.style.display = 'block';
         }
@@ -98,22 +104,6 @@ define(['lodash'], function (_) {
             };
 
             tick();
-        }
-
-        on (eventName, listener) {
-            if (!this.listeners[eventName]) {
-                this.listeners[eventName] = [];
-            }
-
-            this.listeners[eventName].push(listener);
-        }
-
-        dispatch (eventName) {
-            if (this.listeners[eventName]) {
-                for (let i = 0; i < this.listeners[eventName].length; i++) {
-                    this.listeners[eventName][i](this);
-                }
-            }
         }
     }
 });

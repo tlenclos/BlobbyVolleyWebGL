@@ -38,7 +38,7 @@ define(['./sound', 'Box2D', 'THREE'], function (Sound, Box2D, THREE) {
 
             this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-            const texture = THREE.ImageUtils.loadTexture('textures/ball.jpg');
+            const texture = window.assetManager.get('textures.ball');
             const geometry = new THREE.SphereGeometry(this.radius, 64, 64);
             const material = new THREE.MeshPhongMaterial({
                 map: texture,
