@@ -37,7 +37,8 @@ require.config({
                 return this.THREEx.KeyboardState;
             }
         }
-    }
+    },
+    urlArgs: `bust=${(new Date()).getTime()}`
 });
 
 require(['main']);
