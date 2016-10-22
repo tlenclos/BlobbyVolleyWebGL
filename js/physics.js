@@ -1,34 +1,34 @@
-function Physics (gravity) {
-    // Shortcuts
+define(['Box2D', 'lodash'], function (Box2D, _) {
     var b2Vec2 = Box2D.Common.Math.b2Vec2,
-        b2World = Box2D.Dynamics.b2World
-    ;
+        b2World = Box2D.Dynamics.b2World;
 
-    // Properties
-    this.gravity = _.isNumber(gravity) ? gravity : 100;
-    this.world = null;
+    return class Physics {
+        constructor (gravity) {
+            this.gravity = _.isNumber(gravity) ? gravity : 100;
+            this.world = null;
 
-    // Methods
-    this.init = function () {
-        this.world = new b2World(
-            new b2Vec2(0, -this.gravity),
-            true
-        );
-    };
+            this.init();
+        }
 
-    this.getWorld = function () {
-        return this.world;
-    };
+        init () {
+            this.world = new b2World(
+                new b2Vec2(0, -this.gravity),
+                true
+            );
+        }
 
-    this.step = function () {
-        this.world.Step(
-            dt,
-            10,
-            10
-        );
+        getWorld () {
+            return this.world;
+        }
 
-        this.world.ClearForces();
-    };
+        step () {
+            this.world.Step(
+                window.dt,
+                10,
+                10
+            );
 
-    this.init();
-}
+            this.world.ClearForces();
+        }
+    }
+});
