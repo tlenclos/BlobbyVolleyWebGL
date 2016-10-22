@@ -1,5 +1,5 @@
 define(['./assetManager', 'Box2D', 'THREE', 'lodash'], function (assetManager, Box2D, THREE, _) {
-    var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+    const b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,
         b2Body = Box2D.Dynamics.b2Body,
         b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
