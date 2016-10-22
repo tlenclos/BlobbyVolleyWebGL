@@ -1,4 +1,4 @@
-define([], function () {
+define(['lodash'], function (_) {
     return class Rules {
         constructor (config) {
             this.defaultConfig = {

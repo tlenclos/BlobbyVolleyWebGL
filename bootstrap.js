@@ -1,5 +1,8 @@
 require.config({
-    baseUrl: 'js'
+    baseUrl: 'js',
+    paths: {
+        lodash: 'libs/lodash.min'
+    }
 });
 
 require(['main']);

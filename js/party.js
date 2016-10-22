@@ -3,8 +3,9 @@ define([
     './blob',
     './field',
     './player',
-    './physics'
-], function (Ball, Blob, Field, Player, Physics) {
+    './physics',
+    'lodash'
+], function (Ball, Blob, Field, Player, Physics, _) {
     return class Party {
         constructor (scene, rules, playersConfig) {
             this.scene = scene;
@@ -96,11 +97,11 @@ define([
             this.servingSide = 'left';
 
             // Add all meshes to the scene
-            const meshes = _.union(
-                this.field.getParts(),
-                _.map(this.players, function(player) { return player.getBlob().threeObject; }),
+            const meshes = [
+                ...this.field.getParts(),
+                ..._.map(this.players, (player) => player.getBlob().threeObject),
                 this.ball.threeObject
-            );
+            ];
 
             for (let i in meshes) {
                 this.scene.add(meshes[i]);
@@ -119,7 +120,7 @@ define([
             window.dispatchEvent(
                 new CustomEvent(
                     'endGame',
-                    {detail: {message: _.invert(this.scores)[_.max(this.scores)] + ' player wins'}}
+                    {detail: {message: _.invert(this.scores)[_.max(_.values(this.scores))] + ' player wins'}}
                 )
             );
         }
@@ -135,8 +136,8 @@ define([
                 this.incrementScore(winSide);
 
                 // End of game
-                const maxScore = _.max(this.scores),
-                    minScore = _.min(this.scores)
+                const maxScore = _.max(_.values(this.scores)),
+                    minScore = _.min(_.values(this.scores))
                 ;
 
                 if (maxScore >= this.rules.config.scoreToWin && maxScore - minScore > 1) {
@@ -159,7 +160,7 @@ define([
                 // Reset objects
                 this.ball.moveTo([winSide === 'left' ? -5 : 5, 5]);
 
-                _.each(this.players, function (player) {
+                _.forEach(this.players, function (player) {
                     player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
                 });
 
@@ -206,7 +207,7 @@ define([
 
             // Counting maximum touches
             } else {
-                _.each(this.players, function (player) {
+                _.forEach(this.players, function (player) {
                     if (player.getBlob().isTouchingBall()) {
                         player.currentTouches++;
 
@@ -225,12 +226,12 @@ define([
                         winSide = player.side === 'right' ? 'left' : 'right';
                         resetTouches = true;
                     }
-                }, this);
+                }.bind(this));
             }
 
             // Reset touches count
             if (resetTouches) {
-                _.each(this.players, function (player) {
+                _.forEach(this.players, function (player) {
                     player.currentTouches = 0;
                 });
             }

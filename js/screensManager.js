@@ -1,7 +1,7 @@
-define([], function () {
+define(['lodash'], function (_) {
     return class ScreenManager {
         constructor (screens, flashMessageElement, flashMessageTextElement) {
-            _.each(screens, function (item) {
+            _.forEach(screens, function (item) {
                 if (!(item instanceof HTMLElement)) {
                     throw "Screen must be an instance of HTMLElement";
                 }
@@ -52,7 +52,7 @@ define([], function () {
         }
 
         hide () {
-            _.each(this.screens, function (item) {
+            _.forEach(this.screens, function (item) {
                 item.style.display = 'none';
             });
         }

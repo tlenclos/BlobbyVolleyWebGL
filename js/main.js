@@ -1,5 +1,6 @@
 define(function (require) {
-    const ScreenManager = require('./screensManager'),
+    const _ = require('lodash'),
+        ScreenManager = require('./screensManager'),
         Party = require('./party'),
         Rules = require('./rules');
 
@@ -124,7 +125,7 @@ define(function (require) {
                 return false;
             };
 
-            _.each(controlsElements, function(item) {
+            _.forEach(controlsElements, function(item) {
                 const player = parseInt(item.getAttribute('data-player'));
                 const controlName = item.getAttribute('data-control');
                 item.value = initPlayerControls[player][controlName];
@@ -145,7 +146,7 @@ define(function (require) {
                 input.value = ruleValue;
             };
 
-            _.each(rulesElements, function(item) {
+            _.forEach(rulesElements, function(item) {
                 const ruleName = item.getAttribute('data-ruleName');
                 item.value = rules.config[ruleName];
 

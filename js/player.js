@@ -1,4 +1,4 @@
-define([], function () {
+define(['lodash'], function (_) {
     return class Player {
         constructor (name, controls, side) {
             this.name = name;
@@ -10,9 +10,9 @@ define([], function () {
         }
 
         setControls (controls) {
-            _.each(controls, function(value, key) {
+            _.forEach(controls, function(value, key) {
                 this.setControlForKey(key, value);
-            }, this);
+            }.bind(this));
         }
 
         setControlForKey (key, keyBinding) {
