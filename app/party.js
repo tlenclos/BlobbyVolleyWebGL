@@ -246,4 +246,4 @@ export default class Party {
     incrementScore (side) {
         this.scores[side]++;
     }
-    }
+}
