@@ -1,37 +1,34 @@
-function Party (scene, rules, playersConfig) {
-    // Properties
-    this.scene = null;
-    this.rules = null;
-    this.playersConfig = null;
-    this.physics = null;
-    this.field = null;
-    this.players = null;
-    this.ball = null;
-    this.scores = null;
-    this.paused = false;
-    this.lockPause = false;
-    this.playingSide = null;
-    this.servingSide = null;
-    this.inProgress = null;
-
-    // Methods
-    this.init = function () {
+class Party {
+    constructor (scene, rules, playersConfig) {
         this.scene = scene;
         this.rules = rules;
         this.playersConfig = playersConfig;
+        this.physics = null;
+        this.field = null;
+        this.players = null;
+        this.ball = null;
+        this.scores = null;
+        this.paused = false;
+        this.lockPause = false;
+        this.playingSide = null;
+        this.servingSide = null;
+        this.inProgress = null;
+
+        this.init();
+    }
+
+    init () {
         this.resetScore();
-    };
+    }
 
-    this.clearScene = function () {
-        var obj, i;
-
-        for (i = this.scene.children.length - 1; i >= 0; i --) {
-            obj = scene.children[i];
-            scene.remove(obj);
+    clearScene () {
+        for (let i = this.scene.children.length - 1; i >= 0; i --) {
+            let obj = this.scene.children[i];
+            this.scene.remove(obj);
         }
-    };
+    }
 
-    this.resetScore = function () {
+    resetScore () {
         this.scores = {
             left: 0,
             right: 0
@@ -44,9 +41,9 @@ function Party (scene, rules, playersConfig) {
                 {detail: {side: 'left', scores: this.scores}}
             )
         );
-    };
+    }
 
-    this.newGame = function () {
+    newGame () {
         // Clear scene
         this.clearScene();
 
@@ -55,8 +52,8 @@ function Party (scene, rules, playersConfig) {
 
         // Lightning
         // TODO Better lightning
-        light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
-        scene.add(light);
+        const light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+        this.scene.add(light);
 
         // Physics
         this.physics = new Physics(10);
@@ -67,9 +64,9 @@ function Party (scene, rules, playersConfig) {
         // Players
         this.players = [];
 
-        for (var index in this.playersConfig) {
-            var playerConfig = this.playersConfig[index],
-                blob,
+        for (let index in this.playersConfig) {
+            const playerConfig = this.playersConfig[index];
+            let blob,
                 position,
                 color,
                 player
@@ -92,13 +89,13 @@ function Party (scene, rules, playersConfig) {
         this.servingSide = 'left';
 
         // Add all meshes to the scene
-        var meshes = _.union(
+        const meshes = _.union(
             this.field.getParts(),
             _.map(this.players, function(player) { return player.getBlob().threeObject; }),
             this.ball.threeObject
         );
 
-        for (var i in meshes) {
+        for (let i in meshes) {
             this.scene.add(meshes[i]);
         }
 
@@ -107,9 +104,9 @@ function Party (scene, rules, playersConfig) {
         }
 
         this.inProgress = true;
-    };
+    }
 
-    this.endGame = function () {
+    endGame () {
         this.inProgress = false;
 
         window.dispatchEvent(
@@ -118,10 +115,10 @@ function Party (scene, rules, playersConfig) {
                 {detail: {message: _.invert(this.scores)[_.max(this.scores)] + ' player wins'}}
             )
         );
-    };
+    }
 
-    this.afterScoring = function (winSide) {
-        var resetObjects = true;
+    afterScoring (winSide) {
+        let resetObjects = true;
 
         // Internal pause
         this.pause(true);
@@ -131,7 +128,7 @@ function Party (scene, rules, playersConfig) {
             this.incrementScore(winSide);
 
             // End of game
-            var maxScore = _.max(this.scores),
+            const maxScore = _.max(this.scores),
                 minScore = _.min(this.scores)
             ;
 
@@ -159,16 +156,14 @@ function Party (scene, rules, playersConfig) {
                 player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
             });
 
-            var self = this;
-
             _.delay(function () {
-                self.lockPause = false;
-                self.pause(false);
-            }, 1000);
+                this.lockPause = false;
+                this.pause(false);
+            }.bind(this), 1000);
         }
-    };
+    }
 
-    this.pause = function (pause) {
+    pause (pause) {
         if (this.lockPause) {
             throw 'Pause is locked';
         }
@@ -177,24 +172,24 @@ function Party (scene, rules, playersConfig) {
         return this.paused;
     }
 
-    this.update = function () {
+    update () {
         if (this.paused || !this.inProgress) {
             return;
         }
 
         this.applyRules();
 
-        for (var i in this.players) {
+        for (let i in this.players) {
             this.players[i].listenInput();
             this.players[i].getBlob().physics();
         }
 
         this.ball.physics();
         this.physics.step();
-    };
+    }
 
-    this.applyRules = function () {
-        var winSide = null,
+    applyRules () {
+        let winSide = null,
             resetTouches = false
         ;
 
@@ -237,11 +232,9 @@ function Party (scene, rules, playersConfig) {
         if (winSide) {
             this.afterScoring(winSide);
         }
-    };
+    }
 
-    this.incrementScore = function (side) {
+    incrementScore (side) {
         this.scores[side]++;
-    };
-
-    this.init();
+    }
 }

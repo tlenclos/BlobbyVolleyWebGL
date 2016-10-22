@@ -1,80 +1,76 @@
-function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
-    // Properties
-    this.screens = null;
-    this.history = [];
-    this.flashMessageElement = flashMessageElement;
-    this.flashMessageTextElement = flashMessageTextElement;
-    this.listeners = {};
-
-    // Methods
-    this.init = function () {
-        _.each(screens, function(item) {
-            if ( !(item instanceof HTMLElement) ) {
+class ScreenManager {
+    constructor (screens, flashMessageElement, flashMessageTextElement) {
+        _.each(screens, function (item) {
+            if (!(item instanceof HTMLElement)) {
                 throw "Screen must be an instance of HTMLElement";
             }
         });
 
-        if (
-            !(this.flashMessageElement instanceof HTMLElement)
-            || !(this.flashMessageTextElement instanceof HTMLElement)
-        ) {
-            throw "Screen must be an instance of HTMLElement";
+        if (!(flashMessageElement instanceof HTMLElement)) {
+            throw "flashMessageElement must be an instance of HTMLElement";
+        }
+
+        if (!(flashMessageTextElement instanceof HTMLElement)) {
+            throw "flashMessageTextElement must be an instance of HTMLElement";
         }
 
         this.screens = screens;
-    };
+        this.flashMessageElement = flashMessageElement;
+        this.flashMessageTextElement = flashMessageTextElement;
+        this.history = [];
+        this.listeners = {};
+    }
 
-    this.goTo = function (screen) {
+    goTo (screen) {
         this.displayScreen(screen);
         this.history.push(screen);
-    };
+    }
 
-    this.goBack = function() {
-        var index = this.history.length-2;
+    goBack () {
+        const index = this.history.length-2;
 
         if (index >= 0) {
-            var previousScreen = this.history[index];
+            const previousScreen = this.history[index];
             if (previousScreen) {
                 this.displayScreen(previousScreen);
                 this.history.pop();
             }
         }
-    };
+    }
 
-    this.displayScreen = function(screen) {
-        if (_.isUndefined(this.screens[screen])) {
+    displayScreen (name) {
+        if (_.isUndefined(this.screens[name])) {
             throw "Screen does not exist";
         }
 
-        this.dispatch(screen);
-        var screen = this.screens[screen];
+        this.dispatch(name);
+        const screen = this.screens[name];
 
         this.hide();
         screen.style.display = 'block';
-    };
+    }
 
-    this.hide = function() {
-        _.each(this.screens, function(item) {
+    hide () {
+        _.each(this.screens, function (item) {
             item.style.display = 'none';
         });
-    };
+    }
 
-    this.displayFlashMessage = function(message, duration) {
+    displayFlashMessage (message, duration) {
         this.flashMessageTextElement.textContent = message;
         this.fadeIn(this.flashMessageElement);
 
-        var self = this;
-        setTimeout(function() {
-            self.fadeOut(self.flashMessageElement)
-        }, duration ? duration : 2000);
-    };
+        setTimeout(function () {
+            this.fadeOut(this.flashMessageElement)
+        }.bind(this), duration ? duration : 2000);
+    }
 
-    this.fadeIn = function(el) {
+    fadeIn (el) {
         el.style.display = 'block';
         el.style.opacity = 0;
 
-        var last = +new Date();
-        var tick = function() {
+        let last = +new Date();
+        const tick = function () {
             el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
             last = +new Date();
 
@@ -86,12 +82,12 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
         tick();
     }
 
-    this.fadeOut = function(el) {
+    fadeOut (el) {
         el.style.display = 'block';
         el.style.opacity = 1;
 
-        var last = +new Date();
-        var tick = function() {
+        let last = +new Date();
+        const tick = function () {
             el.style.opacity -= (new Date() - last) / 400;
             last = +new Date();
 
@@ -103,21 +99,19 @@ function ScreenManager (screens, flashMessageElement, flashMessageTextElement) {
         tick();
     }
 
-    this.on = function(eventName, listener) {
+    on (eventName, listener) {
         if (!this.listeners[eventName]) {
             this.listeners[eventName] = [];
         }
 
         this.listeners[eventName].push(listener);
-    },
+    }
 
-    this.dispatch = function(eventName) {
+    dispatch (eventName) {
         if (this.listeners[eventName]) {
-            for(var i=0; i<this.listeners[eventName].length; i++) {
+            for (let i = 0; i < this.listeners[eventName].length; i++) {
                 this.listeners[eventName][i](this);
             }
         }
-    },
-
-    this.init();
+    }
 }

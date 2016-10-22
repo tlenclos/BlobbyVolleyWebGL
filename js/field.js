@@ -1,25 +1,29 @@
-function Field (world, x, y, width, height) {
-    // Shortcuts
-    var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-        b2BodyDef = Box2D.Dynamics.b2BodyDef,
-        b2Body = Box2D.Dynamics.b2Body,
-        b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-    ;
+var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+    b2BodyDef = Box2D.Dynamics.b2BodyDef,
+    b2Body = Box2D.Dynamics.b2Body,
+    b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 
-    // Properties
-    this.world = world;
-    this.position = { x: x, y: y };
-    this.dims = [width, height];
-    this.parts = [];
+class Field {
+    constructor (world, x, y, width, height) {
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.position = { x: x, y: y };
+        this.dims = [width, height];
+        this.parts = [];
 
-    // Methods
-    this.init = function () {
-        var ground, leftWall, rightWall, net, bg;
+        this.init();
+    }
+
+    init () {
+        let ground, leftWall, rightWall, net, bg;
 
         ground = this.createWall(
-            x,
-            y - (height / 2) - 0.5,
-            width,
+            this.x,
+            this.y - (this.height / 2) - 0.5,
+            this.width,
             0.5,
             20,
             null,
@@ -32,10 +36,10 @@ function Field (world, x, y, width, height) {
         );
 
         leftWall = this.createWall(
-            x - (width / 2) - 0.5,
-            y + (height / 2),
+            this.x - (this.width / 2) - 0.5,
+            this.y + (this.height / 2),
             0.5,
-            height * 2,
+            this.height * 2,
             20,
             null,
             0,
@@ -46,10 +50,10 @@ function Field (world, x, y, width, height) {
         );
 
         rightWall = this.createWall(
-            x + (width / 2) + 0.5,
-            y + (height / 2),
+            this.x + (this.width / 2) + 0.5,
+            this.y + (this.height / 2),
             0.5,
-            height * 2,
+            this.height * 2,
             20,
             null,
             0,
@@ -60,10 +64,10 @@ function Field (world, x, y, width, height) {
         );
 
         net = this.createWall(
-            x,
-            y - (height / 2) + (height / 4),
+            this.x,
+            this.y - (this.height / 2) + (this.height / 4),
             0.15,
-            height / 2,
+            this.height / 2,
             20,
             null,
             0,
@@ -83,15 +87,15 @@ function Field (world, x, y, width, height) {
         bg.position.y = 12;
 
         this.parts.push(ground, leftWall, rightWall, net, bg);
-    };
+    }
 
-    this.createWall = function (x, y, width, height, depth, density, friction, restitution, texture, color, opacity, userData) {
-        var bodyDef = new b2BodyDef;
+    createWall (x, y, width, height, depth, density, friction, restitution, texture, color, opacity, userData) {
+        const bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         bodyDef.position.x = x;
         bodyDef.position.y = y;
 
-        var fixDef = new b2FixtureDef;
+        const fixDef = new b2FixtureDef;
         fixDef.density = _.isNumber(density) ? density : 1;
         fixDef.friction = _.isNumber(friction) ? friction : 0.5;
         fixDef.restitution = _.isNumber(restitution) ? restitution : 0;
@@ -103,7 +107,7 @@ function Field (world, x, y, width, height) {
             fixDef.shape.SetAsBox(width, height / 2);
         }
 
-        var body = this.world.CreateBody(bodyDef);
+        const body = this.world.CreateBody(bodyDef);
 
         if (typeof userData !== 'undefined') {
             body.SetUserData(userData);
@@ -111,12 +115,12 @@ function Field (world, x, y, width, height) {
 
         body.CreateFixture(fixDef);
 
-        var geometry = width > height
+        const geometry = width > height
             ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
             : new THREE.BoxGeometry(width * 2, height, _.isNumber(depth) ? depth : 0)
         ;
 
-        var material;
+        let material;
 
         if (texture instanceof THREE.Texture) {
             material = new THREE.MeshBasicMaterial({
@@ -131,7 +135,7 @@ function Field (world, x, y, width, height) {
             });
         }
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             geometry,
             material
         );
@@ -139,23 +143,21 @@ function Field (world, x, y, width, height) {
         mesh.position.y = bodyDef.position.y;
 
         return mesh;
-    };
+    }
 
-    this.getWorld = function () {
+    getWorld () {
         return this.world;
-    };
+    }
 
-    this.getPosition = function () {
+    getPosition () {
         return this.position;
-    };
+    }
 
-    this.getDims = function () {
+    getDims () {
         return this.dims;
-    };
+    }
 
-    this.getParts = function () {
+    getParts () {
         return this.parts;
-    };
-
-    this.init();
+    }
 }

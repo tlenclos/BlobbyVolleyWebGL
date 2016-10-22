@@ -1,5 +1,5 @@
 // Variables
-var camera, scene, renderer, stats, container, oldTime, dt,
+let camera, scene, renderer, stats, container, oldTime,
     party,
     screens = {
         "mainMenu": document.getElementById("mainMenu"),
@@ -65,7 +65,7 @@ function init() {
     camera.rotation.x = -5 * Math.PI / 180;
 
     if (debug) {
-        var controls = new THREE.OrbitControls( camera );
+        const controls = new THREE.OrbitControls( camera );
         controls.addEventListener( 'change', render );
     }
 
@@ -99,11 +99,11 @@ function init() {
 
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function() {
-        var keydownOnInputControl = function(e) {
-            var input = e.srcElement;
-            var player = parseInt(input.getAttribute('data-player'));
-            var controlName = input.getAttribute('data-control');
-            var keyTextValue = keycodeDictionary[e.keyCode];
+        const keydownOnInputControl = function(e) {
+            const input = e.srcElement;
+            const player = parseInt(input.getAttribute('data-player'));
+            const controlName = input.getAttribute('data-control');
+            const keyTextValue = keycodeDictionary[e.keyCode];
 
             input.value = keyTextValue;
 
@@ -111,7 +111,7 @@ function init() {
             initPlayerControls[player][controlName] = keyTextValue;
 
             if (party) {
-                var control = {};
+                const control = {};
                 control[controlName] = keyTextValue;
                 party.players[player].setControls(control)
             }
@@ -120,8 +120,8 @@ function init() {
         };
 
         _.each(controlsElements, function(item) {
-            var player = parseInt(item.getAttribute('data-player'));
-            var controlName = item.getAttribute('data-control');
+            const player = parseInt(item.getAttribute('data-player'));
+            const controlName = item.getAttribute('data-control');
             item.value = initPlayerControls[player][controlName];
 
             if (_.isNull(item.onkeydown)) {
@@ -132,16 +132,16 @@ function init() {
 
     // Rules menu is displayed, listen keyboard event on inputs
     screenManager.on("rulesMenu", function() {
-        var keydownOnInputControl = function(e) {
-            var input = e.srcElement;
-            var ruleValue = parseInt(input.value);
-            var ruleName = input.getAttribute('data-ruleName');
+        const keydownOnInputControl = function(e) {
+            const input = e.srcElement;
+            const ruleValue = parseInt(input.value);
+            const ruleName = input.getAttribute('data-ruleName');
             rules.config[ruleName] = ruleValue;
             input.value = ruleValue;
         };
 
         _.each(rulesElements, function(item) {
-            var ruleName = item.getAttribute('data-ruleName');
+            const ruleName = item.getAttribute('data-ruleName');
             item.value = rules.config[ruleName];
 
             if (_.isNull(item.onkeyup)) {
@@ -186,7 +186,7 @@ function pauseGame() {
     if (!party.inProgress)
         return;
 
-    var pauseState = party.pause();
+    const pauseState = party.pause();
 
     if (pauseState) {
         screenManager.goTo("pauseMenu");
@@ -201,7 +201,7 @@ function updateRulesUI(rules) {
 }
 
 function updateScoreUI(event) {
-    var winSide = event.detail.side,
+    const winSide = event.detail.side,
         scores = event.detail.scores
     ;
 
@@ -214,7 +214,7 @@ function updateScoreUI(event) {
 // Animation loop
 function renderLoop(time) {
     // Sync physics with time
-    dt = ((time - oldTime) / 1000) || dt;
+    window.dt = ((time - oldTime) / 1000) || window.dt; // FIXME Do not store dt into window
     oldTime = time;
 
     party.update();
@@ -233,7 +233,7 @@ function render() {
         cancelAnimationFrame(request);
     }
 
-    dt = 1 / 60;
+    window.dt = 1 / 60;
 
     renderLoop();
 }

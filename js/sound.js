@@ -1,33 +1,34 @@
-function Sound (sources) {
-    // Properties
-    this.audio = null;
+class Sound {
+    constructor (sources) {
+        this.sources = sources;
+        this.audio = null;
 
-    // Methods
-    this.init = function () {
+        this.init();
+    }
+
+    init () {
         this.audio = document.createElement('audio');
 
-        for (var i = 0; i < sources.length; i++) {
-            var source = document.createElement('source');
-            source.src = sources[i];
+        for (let i = 0; i < this.sources.length; i++) {
+            const source = document.createElement('source');
+            source.src = this.sources[i];
             this.audio.appendChild(source);
         }
-    };
+    }
 
-    this.getAudio = function () {
+    getAudio () {
        return this.audio;
-    };
+    }
 
-    this.play = function (restart) {
+    play (restart) {
         if (restart === true && this.audio.currentTime > 0) {
             this.stop();
         }
 
         this.audio.play();
-    };
+    }
 
-    this.stop = function () {
+    stop () {
         this.audio.currentTime = 0;
-    };
-
-    this.init();
+    }
 }

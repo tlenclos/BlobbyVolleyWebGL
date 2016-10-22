@@ -1,50 +1,42 @@
-function Player (name, controls, side) {
-    // Properties
-    this.name = name;
-    this.controls = controls;
-    this.side = null;
-    this.keyboard = null;
-    this.blob = null;
-    this.currentTouches = null;
-
-    // Methods
-    this.init = function () {
+class Player {
+    constructor (name, controls, side) {
+        this.name = name;
+        this.controls = controls;
         this.side = side;
         this.keyboard = new THREEx.KeyboardState();
+        this.blob = null;
         this.currentTouches = 0;
-    };
+    }
 
-    this.setControls = function(controls) {
+    setControls (controls) {
         _.each(controls, function(value, key) {
             this.setControlForKey(key, value);
         }, this);
-    };
+    }
 
-    this.setControlForKey = function(key, keyBinding) {
-
+    setControlForKey (key, keyBinding) {
         if (_.isUndefined(this.controls[key])) {
             throw "This control does not exist";
         }
 
         this.controls[key] = keyBinding;
-    };
+    }
 
-    this.getControlsAntagonistKey = function (key) {
-        var antagonists = {
+    getControlsAntagonistKey (key) {
+        const antagonists = {
             'left': 'right',
             'right': 'left'
         };
 
         return antagonists[key];
-    };
+    }
 
-    this.listenInput = function () {
-        var x = 0,
-            y = 0
-        ;
+    listenInput () {
+        let x = 0,
+            y = 0;
 
-        for (var key in this.controls) {
-            var control = this.controls[key],
+        for (let key in this.controls) {
+            const control = this.controls[key],
                 antagonistControl = this.controls[this.getControlsAntagonistKey(key)]
             ;
 
@@ -70,25 +62,23 @@ function Player (name, controls, side) {
                 this.moveBlob(x, y);
             }
         }
-    };
+    }
 
-    this.attachBlob = function(blob) {
+    attachBlob (blob) {
         this.blob = blob;
-    };
+    }
 
-    this.detachBlob = function() {
+    detachBlob () {
         this.blob = null;
-    };
+    }
 
-    this.getBlob = function () {
+    getBlob () {
         return this.blob;
-    };
+    }
 
-    this.moveBlob = function (x, y) {
+    moveBlob (x, y) {
         if (this.blob !== null) {
             this.blob.move(x, y);
         }
-    };
-
-    this.init();
+    }
 }
