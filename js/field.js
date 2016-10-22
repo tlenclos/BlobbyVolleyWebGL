@@ -1,4 +1,4 @@
-define(['Box2D', 'THREE', 'lodash'], function (Box2D, THREE, _) {
+define(['./assetManager', 'Box2D', 'THREE', 'lodash'], function (assetManager, Box2D, THREE, _) {
     var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,
         b2Body = Box2D.Dynamics.b2Body,
@@ -30,7 +30,7 @@ define(['Box2D', 'THREE', 'lodash'], function (Box2D, THREE, _) {
                 null,
                 2,
                 null,
-                THREE.ImageUtils.loadTexture('textures/wood.jpg'),
+                window.assetManager.get('textures.wood'),
                 0xEEEEEE,
                 null,
                 'type_ground'
@@ -81,7 +81,7 @@ define(['Box2D', 'THREE', 'lodash'], function (Box2D, THREE, _) {
             // Background
             bg = new THREE.Mesh(
                 new THREE.PlaneGeometry(110, 90, 0),
-                new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/background.jpg')})
+                new THREE.MeshBasicMaterial({map: window.assetManager.get('textures.background')})
             );
 
             bg.position.z = -20;

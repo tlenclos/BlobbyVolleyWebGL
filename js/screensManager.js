@@ -41,14 +41,18 @@ define(['./eventEmitter', 'lodash'], function (EventEmitter, _) {
             }
         }
 
-        displayScreen (name) {
+        getScreen (name) {
             if (_.isUndefined(this.screens[name])) {
-                throw "Screen does not exist";
+                throw `Screen ${name} does not exist`;
             }
 
-            this.dispatch(name);
-            const screen = this.screens[name];
+            return this.screens[name];
+        }
 
+        displayScreen (name) {
+            const screen = this.getScreen(name);
+
+            this.dispatch(name);
             this.hide();
             screen.style.display = 'block';
         }
