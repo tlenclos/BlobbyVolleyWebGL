@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <title>Blobby Volley WebGL</title>
+        <link rel="stylesheet" href="css/styles.css" type="text/css" media="screen" />
+        <script src="/vendor.js"></script>
+        <script src="/app.js"></script>
+    </head>
+        <body>
+        <div id="score">
+            <p>Score: <span id="scoreLeftDisplay" class="left">0</span> | <span id="scoreRightDisplay" class="right">0</span></p>
+            <p>Service: <span id="serviceDisplay" class="left">Left</span></p>
+            <p>Win at <span id="scoreNeededToWinDisplay"></span></p>
+            <p>Contacts allowed <span id="maximumContactsAllowedDisplay"></span></p>
+        </div>
+
+        <div id="flashMessage" class="depthBox">
+            <p id="flashText"></p>
+        </div>
+
+        <div class="screen depthBox" id="mainMenu">
+            <h2>Welcome to Blobby Volley WebGL</h2>
+            <ul>
+                <li><a href="javascript:newParty()">Play</a></li>
+                <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
+            </ul>
+        </div>
+
+        <div class="screen depthBox" id="pauseMenu">
+            <h2>Game is paused</h2>
+            <ul>
+                <li><a href="javascript:pauseGame()">Resume</a></li>
+                <li><a href="javascript:screenManager.goTo('optionsMenu')">Options</a></li>
+                <li><a href="javascript:newParty()">Start a new game</a></li>
+            </ul>
+        </div>
+
+        <div class="screen depthBox" id="gameOverMenu">
+            <h2 id="gameOverMsg">Game over</h2>
+            <ul>
+                <li><a href="javascript:newParty()">Start a new game</a></li>
+            </ul>
+        </div>
+
+        <div class="screen depthBox" id="optionsMenu">
+            <h2>Options</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+                <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
+                <li><a href="javascript:screenManager.goTo('rulesMenu')">Rules</a></li>
+            </ul>
+        </div>
+
+        <div class="screen depthBox" id="controlsMenu">
+            <h2>Controls</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <div id="leftControls" class="playerControl">
+                <p>Move left <input type="text" class="controlKey" data-player="0" data-control="left" /></p>
+                <p>Move right <input type="text" class="controlKey" data-player="0" data-control="right" /></p>
+                <p>Jump <input type="text" class="controlKey" data-player="0" data-control="up" /></p>
+            </div>
+            <div id="rightControls" class="playerControl">
+                <p>Move left <input type="text" class="controlKey" data-player="1" data-control="left" /></span></p>
+                <p>Move right <input type="text" class="controlKey" data-player="1" data-control="right" /></span></p>
+                <p>Jump <input type="text" class="controlKey" data-player="1" data-control="up" /></p>
+            </div>
+        </div>
+
+        <div class="screen depthBox" id="rulesMenu">
+            <h2>Rules</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <p><strong>Rules will be applied next game.</strong></p>
+            <p>Maximum contacts allowed <input type="text" class="ruleElement" data-ruleName="maximumContactsAllowed" /></p>
+            <p>Score to win <input type="text" class="ruleElement" data-ruleName="scoreToWin"/></p>
+        </div>
+
+        <script>require('main');</script>
+    </body>
+</html>
