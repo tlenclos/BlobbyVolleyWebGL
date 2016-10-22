@@ -1,8 +1,12 @@
 define(function (require) {
     const _ = require('lodash'),
+        Stats = require('Stats'),
+        THREE = require('THREE'),
+        THREExWindowResize = require('THREExWindowResize'),
         ScreenManager = require('./screensManager'),
         Party = require('./party'),
-        Rules = require('./rules');
+        Rules = require('./rules'),
+        keycodeDictionary = require('./keycodeDictionary');
 
     // Variables
     let camera, scene, renderer, stats, container, oldTime,
@@ -76,7 +80,7 @@ define(function (require) {
         }
 
         // Window resizing
-        THREEx.WindowResize(renderer, camera);
+        THREExWindowResize(renderer, camera);
 
         // Stats
         stats = new Stats();

@@ -1,10 +1,10 @@
-define(['lodash'], function (_) {
+define(['THREExKeyboardState', 'lodash'], function (THREExKeyboardState, _) {
     return class Player {
         constructor (name, controls, side) {
             this.name = name;
             this.controls = controls;
             this.side = side;
-            this.keyboard = new THREEx.KeyboardState();
+            this.keyboard = new THREExKeyboardState();
             this.blob = null;
             this.currentTouches = 0;
         }

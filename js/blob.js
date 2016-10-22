@@ -1,4 +1,4 @@
-define([], function () {
+define(['Box2D', 'THREE'], function (Box2D, THREE) {
     var b2Vec2 = Box2D.Common.Math.b2Vec2,
         b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,

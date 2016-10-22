@@ -1,4 +1,4 @@
-define(['lodash'], function (_) {
+define(['Box2D', 'THREE', 'lodash'], function (Box2D, THREE, _) {
     var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
         b2BodyDef = Box2D.Dynamics.b2BodyDef,
         b2Body = Box2D.Dynamics.b2Body,

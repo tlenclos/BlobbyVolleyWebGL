@@ -6,9 +6,3 @@ env:
     amd: true
     browser: true
     es6: true
-globals:
-    Box2D: false
-    keycodeDictionary: false
-    Stats: false
-    THREE: false
-    THREEx: false

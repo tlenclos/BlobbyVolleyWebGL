@@ -1,4 +1,4 @@
-define(['lodash'], function (_) {
+define(['Box2D', 'lodash'], function (Box2D, _) {
     var b2Vec2 = Box2D.Common.Math.b2Vec2,
         b2World = Box2D.Dynamics.b2World;
 

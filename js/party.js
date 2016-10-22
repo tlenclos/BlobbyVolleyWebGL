@@ -4,8 +4,9 @@ define([
     './field',
     './player',
     './physics',
+    'THREE',
     'lodash'
-], function (Ball, Blob, Field, Player, Physics, _) {
+], function (Ball, Blob, Field, Player, Physics, THREE, _) {
     return class Party {
         constructor (scene, rules, playersConfig) {
             this.scene = scene;
