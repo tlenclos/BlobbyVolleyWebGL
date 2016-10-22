@@ -1,7 +1,7 @@
 Blobby Volley WebGL
 ===================
 
-This is a clone of the Blobby Volley game (http://www.blobbyvolley.fr) in WebGL with three.js.
+This is a clone of the Blobby Volley game (https://en.wikipedia.org/wiki/Blobby_Volley) in WebGL with three.js.
 
 Feel free to contribute or follow the development on [trello][1] !
 
