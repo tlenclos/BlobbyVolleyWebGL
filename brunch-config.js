@@ -10,7 +10,7 @@ module.exports = {
     },
     plugins: {
         babel: {
-            presets: ['es2015'],
+            presets: [['es2015', { loose: true }]],
             plugins: ['add-module-exports']
         }
     }
