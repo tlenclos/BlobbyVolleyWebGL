@@ -3,6 +3,7 @@ define(function (require) {
         Stats = require('Stats'),
         THREE = require('THREE'),
         THREExWindowResize = require('THREExWindowResize'),
+        screenfull = require('screenfull'),
         AssetManager = require('./assetManager'),
         ScreenManager = require('./screensManager'),
         Party = require('./party'),
@@ -18,6 +19,7 @@ define(function (require) {
             "pauseMenu": document.getElementById("pauseMenu"),
             "gameOverMenu": document.getElementById("gameOverMenu"),
             "optionsMenu": document.getElementById("optionsMenu"),
+            "videoMenu": document.getElementById("videoMenu"),
             "controlsMenu": document.getElementById("controlsMenu"),
             "rulesMenu": document.getElementById("rulesMenu")
         },
@@ -34,6 +36,7 @@ define(function (require) {
         serviceDisplay = document.getElementById("serviceDisplay"),
         scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay"),
         maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
+        videoParameterElements = screens['videoMenu'].querySelectorAll('.videoParameterElement'),
         controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
         rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
         initPlayerControls = [
@@ -119,6 +122,14 @@ define(function (require) {
         });
 
         /* Events */
+        // Prevent F11 to toggle fullscreen, go to video options instead
+        document.addEventListener('keydown', function (event) {
+            if (event.keyCode === 122) {
+                event.preventDefault();
+                screenManager.goTo('optionsMenu').goTo('videoMenu');
+            }
+        });
+
         // End game event listener
         window.addEventListener("endGame", function(e) {
             screenManager.displayFlashMessage(e.detail.message);
@@ -129,6 +140,33 @@ define(function (require) {
 
         // Score event listener
         window.addEventListener("score", updateScoreUI);
+
+        // Video menu is displayed, listen keyboard event on inputs
+        screenManager.on("videoMenu", function() {
+            const onChange = function (e) {
+                const input = e.srcElement;
+                const value = input.value;
+                const name = input.getAttribute('data-parameter');
+
+                // Fullscreen
+                if (name === 'fullscreen' && screenfull.enabled) {
+                    screenfull.toggle();
+                    return;
+                }
+
+                rules.config[name] = value;
+                input.value = value;
+            };
+
+            _.forEach(videoParameterElements, function (item) {
+                const parameter = item.getAttribute('data-parameter');
+                item.value = rules.config[parameter];
+
+                if (_.isNull(item.onchange)) {
+                    item.onchange = onChange;
+                }
+            });
+        });
 
         // Control menu is displayed, listen keyboard event on inputs
         screenManager.on("controlsMenu", function() {

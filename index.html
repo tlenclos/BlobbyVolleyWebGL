@@ -48,9 +48,18 @@
             <h2>Options</h2>
             <ul>
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
+                <li><a href="javascript:screenManager.goTo('videoMenu')">Video</a></li>
                 <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
                 <li><a href="javascript:screenManager.goTo('rulesMenu')">Rules</a></li>
             </ul>
+        </div>
+
+        <div class="screen depthBox" id="videoMenu">
+            <h2>Video</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <p>Fullscreen <input type="checkbox" class="videoParameterElement" data-parameter="fullscreen" /></p>
         </div>
 
         <div class="screen depthBox" id="controlsMenu">
