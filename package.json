@@ -7,7 +7,9 @@
     "type": "git"
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "screenfull": "^3.0.2"
+  },
   "devDependencies": {
     "eslint": "^3.8.1",
     "lint-staged": "^3.2.0",

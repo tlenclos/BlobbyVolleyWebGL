@@ -7,7 +7,8 @@ require.config({
         THREE: 'libs/three.min',
         OrbitControls: 'libs/OrbitControls',
         THREExWindowResize: 'libs/THREEx.WindowResize',
-        THREExKeyboardState: 'libs/THREEx.KeyboardState'
+        THREExKeyboardState: 'libs/THREEx.KeyboardState',
+        screenfull: '../node_modules/screenfull/dist/screenfull'
     },
     shim: {
         Box2D: {
@@ -36,6 +37,9 @@ require.config({
             init: function () {
                 return this.THREEx.KeyboardState;
             }
+        },
+        screenfull: {
+            exports: 'screenfull'
         }
     },
     urlArgs: `bust=${(new Date()).getTime()}`

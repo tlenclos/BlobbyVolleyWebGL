@@ -27,6 +27,7 @@ define(['./eventEmitter', 'lodash'], function (EventEmitter, _) {
         goTo (screen) {
             this.displayScreen(screen);
             this.history.push(screen);
+            return this;
         }
 
         goBack () {
