@@ -102,7 +102,7 @@ function initGame() {
     camera.rotation.x = -5 * Math.PI / 180;
 
     if (debug) {
-        const controls = new THREE.OrbitControls( camera );
+        const controls = new OrbitControls( camera );
         controls.addEventListener( 'change', render );
     }
 

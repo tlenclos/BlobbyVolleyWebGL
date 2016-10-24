@@ -2,7 +2,7 @@ import THREE from 'three';
 import _ from 'lodash';
 import Box2D from './libs/Box2dWeb-2.1.a.3';
 
-var b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+const b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
     b2BodyDef = Box2D.Dynamics.b2BodyDef,
     b2Body = Box2D.Dynamics.b2Body,
     b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;

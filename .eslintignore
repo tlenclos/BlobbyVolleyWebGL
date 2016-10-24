@@ -1,1 +1,3 @@
-/js/libs/
+/app/libs/
+/public/
+/brunch-config.js

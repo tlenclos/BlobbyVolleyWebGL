@@ -1025,17 +1025,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var OrbitControls = require('three-orbit-controls')(_three2.default);
 
 // Variables
-console.log({
-    "loadingMenu": document.getElementById("loadingMenu"),
-    "mainMenu": document.getElementById("mainMenu"),
-    "pauseMenu": document.getElementById("pauseMenu"),
-    "gameOverMenu": document.getElementById("gameOverMenu"),
-    "optionsMenu": document.getElementById("optionsMenu"),
-    "videoMenu": document.getElementById("videoMenu"),
-    "controlsMenu": document.getElementById("controlsMenu"),
-    "rulesMenu": document.getElementById("rulesMenu")
-});
-
 var camera = void 0,
     scene = void 0,
     renderer = void 0,
@@ -1123,7 +1112,7 @@ function initGame() {
     camera.rotation.x = -5 * Math.PI / 180;
 
     if (debug) {
-        var controls = new _three2.default.OrbitControls(camera);
+        var controls = new OrbitControls(camera);
         controls.addEventListener('change', render);
     }
 

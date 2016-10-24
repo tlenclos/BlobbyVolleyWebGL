@@ -1,7 +1,7 @@
 import Box2D from './libs/Box2dWeb-2.1.a.3';
 import THREE from 'three';
 
-var b2Vec2 = Box2D.Common.Math.b2Vec2,
+const b2Vec2 = Box2D.Common.Math.b2Vec2,
     b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
     b2BodyDef = Box2D.Dynamics.b2BodyDef,
     b2Body = Box2D.Dynamics.b2Body,

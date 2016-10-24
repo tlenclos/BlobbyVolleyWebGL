@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Box2D from './libs/Box2dWeb-2.1.a.3';
 
-var b2Vec2 = Box2D.Common.Math.b2Vec2,
+const b2Vec2 = Box2D.Common.Math.b2Vec2,
     b2World = Box2D.Dynamics.b2World;
 
 export default class Physics {
