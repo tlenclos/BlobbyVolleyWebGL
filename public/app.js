@@ -149,6 +149,101 @@ var __makeRelativeRequire = function(require, mappings, pref) {
     return require(name);
   }
 };
+require.register("assetManager.js", function(exports, require, module) {
+'use strict';
+
+exports.__esModule = true;
+
+var _eventEmitter = require('./eventEmitter');
+
+var _eventEmitter2 = _interopRequireDefault(_eventEmitter);
+
+var _three = require('three');
+
+var _three2 = _interopRequireDefault(_three);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var AssetManager = function (_EventEmitter) {
+    _inherits(AssetManager, _EventEmitter);
+
+    function AssetManager() {
+        _classCallCheck(this, AssetManager);
+
+        var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
+
+        _this.assets = {};
+        _this.loadingManager = new _three2.default.LoadingManager();
+        _this.loadingManager.onLoad = _this._loaded.bind(_this);
+        _this.loadingManager.onProgress = _this._progressing.bind(_this);
+        _this.loadingManager.onError = _this._error.bind(_this);
+        _this.textureLoader = new _three2.default.TextureLoader(_this.loadingManager);
+        return _this;
+    }
+
+    AssetManager.prototype._loaded = function _loaded() {
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        this.dispatch.apply(this, ['loaded'].concat(args));
+    };
+
+    AssetManager.prototype._progressing = function _progressing() {
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        this.dispatch.apply(this, ['progress'].concat(args));
+    };
+
+    AssetManager.prototype._error = function _error() {
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
+
+        this.dispatch.apply(this, ['error'].concat(args));
+    };
+
+    AssetManager.prototype.loadTexture = function loadTexture(path) {
+        var _this2 = this;
+
+        this.textureLoader.load(path, function (texture) {
+            return _this2.set(path.replace(/\.[^.]+$/, '').replace('/', '.'), texture);
+        });
+    };
+
+    AssetManager.prototype.has = function has(path) {
+        return _lodash2.default.has(this.assets, path);
+    };
+
+    AssetManager.prototype.get = function get(path) {
+        return _lodash2.default.get(this.assets, path);
+    };
+
+    AssetManager.prototype.set = function set(path, asset) {
+        _lodash2.default.set(this.assets, path, asset);
+        return this;
+    };
+
+    return AssetManager;
+}(_eventEmitter2.default);
+
+exports.default = AssetManager;
+module.exports = exports['default'];
+
+});
+
 require.register("ball.js", function(exports, require, module) {
 'use strict';
 
@@ -211,7 +306,7 @@ var Ball = function () {
 
         this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-        var texture = _three2.default.ImageUtils.loadTexture('textures/ball.jpg');
+        var texture = window.assetManager.get('textures.ball');
         var geometry = new _three2.default.SphereGeometry(this.radius, 64, 64);
         var material = new _three2.default.MeshPhongMaterial({
             map: texture,
@@ -436,6 +531,50 @@ module.exports = exports['default'];
 
 });
 
+require.register("eventEmitter.js", function(exports, require, module) {
+"use strict";
+
+exports.__esModule = true;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EventEmitter = function () {
+    function EventEmitter() {
+        _classCallCheck(this, EventEmitter);
+
+        this.listeners = {};
+    }
+
+    EventEmitter.prototype.on = function on(eventName, listener) {
+        if (!this.listeners[eventName]) {
+            this.listeners[eventName] = [];
+        }
+
+        this.listeners[eventName].push(listener);
+    };
+
+    EventEmitter.prototype.dispatch = function dispatch(eventName) {
+        if (this.listeners[eventName]) {
+            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                args[_key - 1] = arguments[_key];
+            }
+
+            for (var i = 0; i < this.listeners[eventName].length; i++) {
+                var _listeners$eventName;
+
+                (_listeners$eventName = this.listeners[eventName])[i].apply(_listeners$eventName, [this].concat(args));
+            }
+        }
+    };
+
+    return EventEmitter;
+}();
+
+exports.default = EventEmitter;
+module.exports = exports["default"];
+
+});
+
 require.register("field.js", function(exports, require, module) {
 'use strict';
 
@@ -485,7 +624,7 @@ var Field = function () {
             net = void 0,
             bg = void 0;
 
-        ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 0.5, 20, null, 2, null, _three2.default.ImageUtils.loadTexture('textures/wood.jpg'), 0xEEEEEE, null, 'type_ground');
+        ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 0.5, 20, null, 2, null, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
 
         leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 0.5, this.height * 2, 20, null, 0, null, null, 0xDEDEDE, 0);
 
@@ -494,7 +633,7 @@ var Field = function () {
         net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.15, this.height / 2, 20, null, 0, null, null, 0xDEDEDE, 0.8);
 
         // Background
-        bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: _three2.default.ImageUtils.loadTexture('textures/background.jpg') }));
+        bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: window.assetManager.get('textures.background') }));
 
         bg.position.z = -20;
         bg.position.y = 12;
@@ -857,6 +996,10 @@ var _threeWindowResize = require('three-window-resize');
 
 var _threeWindowResize2 = _interopRequireDefault(_threeWindowResize);
 
+var _screenfull = require('screenfull');
+
+var _screenfull2 = _interopRequireDefault(_screenfull);
+
 var _screensManager = require('./screensManager');
 
 var _screensManager2 = _interopRequireDefault(_screensManager);
@@ -873,16 +1016,26 @@ var _keycodeDictionary = require('./keycodeDictionary');
 
 var _keycodeDictionary2 = _interopRequireDefault(_keycodeDictionary);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _assetManager = require('./assetManager');
 
-console.log('Rules', _rules2.default);
-console.log('Rules2', new _rules2.default());
-console.log('Party', _party2.default);
-console.log('Party2', new _party2.default());
+var _assetManager2 = _interopRequireDefault(_assetManager);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var OrbitControls = require('three-orbit-controls')(_three2.default);
 
 // Variables
+console.log({
+    "loadingMenu": document.getElementById("loadingMenu"),
+    "mainMenu": document.getElementById("mainMenu"),
+    "pauseMenu": document.getElementById("pauseMenu"),
+    "gameOverMenu": document.getElementById("gameOverMenu"),
+    "optionsMenu": document.getElementById("optionsMenu"),
+    "videoMenu": document.getElementById("videoMenu"),
+    "controlsMenu": document.getElementById("controlsMenu"),
+    "rulesMenu": document.getElementById("rulesMenu")
+});
+
 var camera = void 0,
     scene = void 0,
     renderer = void 0,
@@ -891,14 +1044,17 @@ var camera = void 0,
     oldTime = void 0,
     party = void 0,
     screens = {
+    "loadingMenu": document.getElementById("loadingMenu"),
     "mainMenu": document.getElementById("mainMenu"),
     "pauseMenu": document.getElementById("pauseMenu"),
     "gameOverMenu": document.getElementById("gameOverMenu"),
     "optionsMenu": document.getElementById("optionsMenu"),
+    "videoMenu": document.getElementById("videoMenu"),
     "controlsMenu": document.getElementById("controlsMenu"),
     "rulesMenu": document.getElementById("rulesMenu")
 },
     screenManager = new _screensManager2.default(screens, document.getElementById("flashMessage"), document.getElementById("flashText")),
+    assetManager = new _assetManager2.default(),
     request = void 0,
     initialized = false,
     scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
@@ -906,6 +1062,7 @@ var camera = void 0,
     serviceDisplay = document.getElementById("serviceDisplay"),
     scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay"),
     maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
+    videoParameterElements = screens['videoMenu'].querySelectorAll('.videoParameterElement'),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
     rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
     initPlayerControls = [{
@@ -923,7 +1080,7 @@ var camera = void 0,
 // Bootstrap
 init();
 
-// Init game
+// Init
 function init() {
     if (initialized) {
         return;
@@ -931,6 +1088,26 @@ function init() {
 
     initialized = true;
 
+    // Load game
+    screenManager.goTo("loadingMenu");
+    loadGame();
+}
+
+// Load game
+function loadGame() {
+    // Assets
+    assetManager.on('loaded', initGame);
+    assetManager.on('error', function (component, error) {
+        screenManager.getScreen('loadingMenu').classList.add('error');
+        throw error;
+    });
+    assetManager.loadTexture('textures/wood.jpg');
+    assetManager.loadTexture('textures/background.jpg');
+    assetManager.loadTexture('textures/ball.jpg');
+}
+
+// Init game
+function initGame() {
     // Scene
     scene = new _three2.default.Scene();
     camera = new _three2.default.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -946,7 +1123,7 @@ function init() {
     camera.rotation.x = -5 * Math.PI / 180;
 
     if (debug) {
-        var controls = new OrbitControls(camera);
+        var controls = new _three2.default.OrbitControls(camera);
         controls.addEventListener('change', render);
     }
 
@@ -967,6 +1144,14 @@ function init() {
     });
 
     /* Events */
+    // Prevent F11 to toggle fullscreen, go to video options instead
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode === 122) {
+            event.preventDefault();
+            screenManager.goTo('optionsMenu').goTo('videoMenu');
+        }
+    });
+
     // End game event listener
     window.addEventListener("endGame", function (e) {
         screenManager.displayFlashMessage(e.detail.message);
@@ -977,6 +1162,33 @@ function init() {
 
     // Score event listener
     window.addEventListener("score", updateScoreUI);
+
+    // Video menu is displayed, listen keyboard event on inputs
+    screenManager.on("videoMenu", function () {
+        var onChange = function onChange(e) {
+            var input = e.srcElement;
+            var value = input.value;
+            var name = input.getAttribute('data-parameter');
+
+            // Fullscreen
+            if (name === 'fullscreen' && _screenfull2.default.enabled) {
+                _screenfull2.default.toggle();
+                return;
+            }
+
+            rules.config[name] = value;
+            input.value = value;
+        };
+
+        _lodash2.default.forEach(videoParameterElements, function (item) {
+            var parameter = item.getAttribute('data-parameter');
+            item.value = rules.config[parameter];
+
+            if (_lodash2.default.isNull(item.onchange)) {
+                item.onchange = onChange;
+            }
+        });
+    });
 
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function () {
@@ -1114,6 +1326,7 @@ function render() {
 window.newParty = newParty;
 window.pauseGame = pauseGame;
 window.screenManager = screenManager;
+window.assetManager = assetManager;
 
 });
 
@@ -1569,21 +1782,33 @@ module.exports = exports['default'];
 });
 
 require.register("screensManager.js", function(exports, require, module) {
-"use strict";
+'use strict';
 
 exports.__esModule = true;
 
-var _lodash = require("lodash");
+var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
+
+var _eventEmitter = require('./eventEmitter');
+
+var _eventEmitter2 = _interopRequireDefault(_eventEmitter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ScreenManager = function () {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ScreenManager = function (_EventEmitter) {
+    _inherits(ScreenManager, _EventEmitter);
+
     function ScreenManager(screens, flashMessageElement, flashMessageTextElement) {
         _classCallCheck(this, ScreenManager);
+
+        var _this = _possibleConstructorReturn(this, _EventEmitter.call(this));
 
         _lodash2.default.forEach(screens, function (item) {
             if (!(item instanceof HTMLElement)) {
@@ -1599,16 +1824,18 @@ var ScreenManager = function () {
             throw "flashMessageTextElement must be an instance of HTMLElement";
         }
 
-        this.screens = screens;
-        this.flashMessageElement = flashMessageElement;
-        this.flashMessageTextElement = flashMessageTextElement;
-        this.history = [];
-        this.listeners = {};
+        _this.screens = screens;
+        _this.flashMessageElement = flashMessageElement;
+        _this.flashMessageTextElement = flashMessageTextElement;
+        _this.history = [];
+        _this.listeners = {};
+        return _this;
     }
 
     ScreenManager.prototype.goTo = function goTo(screen) {
         this.displayScreen(screen);
         this.history.push(screen);
+        return this;
     };
 
     ScreenManager.prototype.goBack = function goBack() {
@@ -1623,14 +1850,18 @@ var ScreenManager = function () {
         }
     };
 
-    ScreenManager.prototype.displayScreen = function displayScreen(name) {
+    ScreenManager.prototype.getScreen = function getScreen(name) {
         if (_lodash2.default.isUndefined(this.screens[name])) {
-            throw "Screen does not exist";
+            throw 'Screen ' + name + ' does not exist';
         }
 
-        this.dispatch(name);
-        var screen = this.screens[name];
+        return this.screens[name];
+    };
 
+    ScreenManager.prototype.displayScreen = function displayScreen(name) {
+        var screen = this.getScreen(name);
+
+        this.dispatch(name);
         this.hide();
         screen.style.display = 'block';
     };
@@ -1684,27 +1915,11 @@ var ScreenManager = function () {
         tick();
     };
 
-    ScreenManager.prototype.on = function on(eventName, listener) {
-        if (!this.listeners[eventName]) {
-            this.listeners[eventName] = [];
-        }
-
-        this.listeners[eventName].push(listener);
-    };
-
-    ScreenManager.prototype.dispatch = function dispatch(eventName) {
-        if (this.listeners[eventName]) {
-            for (var i = 0; i < this.listeners[eventName].length; i++) {
-                this.listeners[eventName][i](this);
-            }
-        }
-    };
-
     return ScreenManager;
-}();
+}(_eventEmitter2.default);
 
 exports.default = ScreenManager;
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 });
 

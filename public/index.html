@@ -5,7 +5,7 @@
         <script src="/vendor.js"></script>
         <script src="/app.js"></script>
     </head>
-        <body>
+    <body>
         <div id="score">
             <p>Score: <span id="scoreLeftDisplay" class="left">0</span> | <span id="scoreRightDisplay" class="right">0</span></p>
             <p>Service: <span id="serviceDisplay" class="left">Left</span></p>
@@ -15,6 +15,10 @@
 
         <div id="flashMessage" class="depthBox">
             <p id="flashText"></p>
+        </div>
+
+        <div class="screen depthBox" id="loadingMenu">
+            <h2>Loading game...</h2>
         </div>
 
         <div class="screen depthBox" id="mainMenu">
@@ -45,9 +49,18 @@
             <h2>Options</h2>
             <ul>
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
+                <li><a href="javascript:screenManager.goTo('videoMenu')">Video</a></li>
                 <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
                 <li><a href="javascript:screenManager.goTo('rulesMenu')">Rules</a></li>
             </ul>
+        </div>
+
+        <div class="screen depthBox" id="videoMenu">
+            <h2>Video</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <p><label>Fullscreen <input type="checkbox" class="videoParameterElement" data-parameter="fullscreen" /></label></p>
         </div>
 
         <div class="screen depthBox" id="controlsMenu">
@@ -56,14 +69,14 @@
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
             </ul>
             <div id="leftControls" class="playerControl">
-                <p>Move left <input type="text" class="controlKey" data-player="0" data-control="left" /></p>
-                <p>Move right <input type="text" class="controlKey" data-player="0" data-control="right" /></p>
-                <p>Jump <input type="text" class="controlKey" data-player="0" data-control="up" /></p>
+                <p><label>Move left <input type="text" class="controlKey" data-player="0" data-control="left" /></label></p>
+                <p><label>Move right <input type="text" class="controlKey" data-player="0" data-control="right" /></label></p>
+                <p><label>Jump <input type="text" class="controlKey" data-player="0" data-control="up" /></label></p>
             </div>
             <div id="rightControls" class="playerControl">
-                <p>Move left <input type="text" class="controlKey" data-player="1" data-control="left" /></span></p>
-                <p>Move right <input type="text" class="controlKey" data-player="1" data-control="right" /></span></p>
-                <p>Jump <input type="text" class="controlKey" data-player="1" data-control="up" /></p>
+                <p><label>Move left <input type="text" class="controlKey" data-player="1" data-control="left" /></label></p>
+                <p><label>Move right <input type="text" class="controlKey" data-player="1" data-control="right" /></label></p>
+                <p><label>Jump <input type="text" class="controlKey" data-player="1" data-control="up" /></label></p>
             </div>
         </div>
 
@@ -73,8 +86,8 @@
                 <li><a href="javascript:screenManager.goBack()">Back</a></li>
             </ul>
             <p><strong>Rules will be applied next game.</strong></p>
-            <p>Maximum contacts allowed <input type="text" class="ruleElement" data-ruleName="maximumContactsAllowed" /></p>
-            <p>Score to win <input type="text" class="ruleElement" data-ruleName="scoreToWin"/></p>
+            <p><label>Maximum contacts allowed <input type="text" class="ruleElement" data-ruleName="maximumContactsAllowed" /></label></p>
+            <p><label>Score to win <input type="text" class="ruleElement" data-ruleName="scoreToWin"/></label></p>
         </div>
 
         <script>require('main');</script>

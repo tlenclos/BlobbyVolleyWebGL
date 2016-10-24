@@ -15,6 +15,10 @@ canvas {
     border-right: solid 10px #0F5713;
 }
 
+.depthBox.error {
+    border-color: #ff0000;
+}
+
 #flashMessage {
     z-index: 100;
     opacity: 0.8;

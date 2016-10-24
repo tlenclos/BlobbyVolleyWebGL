@@ -33,7 +33,7 @@ export default class Field {
             null,
             2,
             null,
-            THREE.ImageUtils.loadTexture('textures/wood.jpg'),
+            window.assetManager.get('textures.wood'),
             0xEEEEEE,
             null,
             'type_ground'
@@ -84,7 +84,7 @@ export default class Field {
         // Background
         bg = new THREE.Mesh(
             new THREE.PlaneGeometry(110, 90, 0),
-            new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('textures/background.jpg')})
+            new THREE.MeshBasicMaterial({map: window.assetManager.get('textures.background')})
         );
 
         bg.position.z = -20;
@@ -120,9 +120,9 @@ export default class Field {
         body.CreateFixture(fixDef);
 
         const geometry = width > height
-            ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
-            : new THREE.BoxGeometry(width * 2, height, _.isNumber(depth) ? depth : 0)
-        ;
+                ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
+                : new THREE.BoxGeometry(width * 2, height, _.isNumber(depth) ? depth : 0)
+            ;
 
         let material;
 

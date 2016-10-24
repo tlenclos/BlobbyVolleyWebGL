@@ -41,7 +41,7 @@ export default class Ball {
 
         this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 
-        const texture = THREE.ImageUtils.loadTexture('textures/ball.jpg');
+        const texture = window.assetManager.get('textures.ball');
         const geometry = new THREE.SphereGeometry(this.radius, 64, 64);
         const material = new THREE.MeshPhongMaterial({
             map: texture,
@@ -59,7 +59,7 @@ export default class Ball {
             pos = body.GetDefinition().position,
             velocity = body.GetLinearVelocity(),
             speed = velocity.Length()
-        ;
+            ;
 
         if (speed > this.maxSpeed) {
             body.SetLinearVelocity(
@@ -81,7 +81,7 @@ export default class Ball {
     hasTouchingContact () {
         let touching = false,
             contacts = this.fixture.GetBody().GetContactList()
-        ;
+            ;
 
         while (touching === false && contacts !== null) {
             touching = contacts.contact.IsTouching();
@@ -95,7 +95,7 @@ export default class Ball {
         let contacts = this.fixture.GetBody().GetContactList(),
             groundContact,
             isTouchingGround = false
-        ;
+            ;
 
         while (typeof groundContact === 'undefined' && contacts !== null) {
             if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {

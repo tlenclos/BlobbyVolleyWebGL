@@ -59,7 +59,7 @@ export default class Blob {
                 vel = body.GetLinearVelocity(),
                 velDelta = (this.speed * x) - vel.x,
                 force = body.GetMass() * velDelta / (window.dt)
-            ;
+                ;
 
             body.ApplyForce(
                 new b2Vec2(force, 0),
@@ -71,7 +71,7 @@ export default class Blob {
     handleJump () {
         const body = this.fixture.GetBody(),
             yVelocity = body.GetLinearVelocity().y
-        ;
+            ;
 
         // Allow jumping
         if (!this.jumpAllowed && yVelocity < 0.00001 && this.isTouchingGround()) {
@@ -94,7 +94,7 @@ export default class Blob {
         let contacts = this.fixture.GetBody().GetContactList(),
             groundContact,
             isTouchingGround = false
-        ;
+            ;
 
         while (typeof groundContact === 'undefined' && contacts !== null) {
             if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {
@@ -112,7 +112,7 @@ export default class Blob {
         let contacts = this.fixture.GetBody().GetContactList(),
             ballContact,
             isTouchingBall = false
-        ;
+            ;
 
         while (typeof ballContact === 'undefined' && contacts !== null) {
             if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ball') {

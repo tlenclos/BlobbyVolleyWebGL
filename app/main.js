@@ -2,15 +2,12 @@ import _ from 'lodash';
 import Stats from 'stats.js';
 import THREE from 'three';
 import THREExWindowResize from 'three-window-resize';
+import screenfull from 'screenfull';
 import ScreenManager from './screensManager';
 import Party from './party';
 import Rules from './rules';
 import keycodeDictionary from './keycodeDictionary';
-
-console.log('Rules', Rules);
-console.log('Rules2', new Rules());
-console.log('Party', Party);
-console.log('Party2', new Party());
+import AssetManager from './assetManager';
 
 const OrbitControls = require('three-orbit-controls')(THREE);
 
@@ -18,10 +15,12 @@ const OrbitControls = require('three-orbit-controls')(THREE);
 let camera, scene, renderer, stats, container, oldTime,
     party,
     screens = {
+        "loadingMenu": document.getElementById("loadingMenu"),
         "mainMenu": document.getElementById("mainMenu"),
         "pauseMenu": document.getElementById("pauseMenu"),
         "gameOverMenu": document.getElementById("gameOverMenu"),
         "optionsMenu": document.getElementById("optionsMenu"),
+        "videoMenu": document.getElementById("videoMenu"),
         "controlsMenu": document.getElementById("controlsMenu"),
         "rulesMenu": document.getElementById("rulesMenu")
     },
@@ -30,6 +29,7 @@ let camera, scene, renderer, stats, container, oldTime,
         document.getElementById("flashMessage"),
         document.getElementById("flashText")
     ),
+    assetManager = new AssetManager(),
     request,
     initialized = false,
     scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
@@ -37,6 +37,7 @@ let camera, scene, renderer, stats, container, oldTime,
     serviceDisplay = document.getElementById("serviceDisplay"),
     scoreNeededToWinDisplay = document.getElementById("scoreNeededToWinDisplay"),
     maximumContactsAllowedDisplay = document.getElementById("maximumContactsAllowedDisplay"),
+    videoParameterElements = screens['videoMenu'].querySelectorAll('.videoParameterElement'),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
     rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
     initPlayerControls = [
@@ -53,12 +54,12 @@ let camera, scene, renderer, stats, container, oldTime,
     ],
     rules = new Rules(),
     debug = false
-;
+    ;
 
 // Bootstrap
 init();
 
-// Init game
+// Init
 function init() {
     if (initialized) {
         return;
@@ -66,6 +67,26 @@ function init() {
 
     initialized = true;
 
+    // Load game
+    screenManager.goTo("loadingMenu");
+    loadGame();
+}
+
+// Load game
+function loadGame () {
+    // Assets
+    assetManager.on('loaded', initGame);
+    assetManager.on('error', (component, error) => {
+        screenManager.getScreen('loadingMenu').classList.add('error');
+        throw error;
+    });
+    assetManager.loadTexture('textures/wood.jpg');
+    assetManager.loadTexture('textures/background.jpg');
+    assetManager.loadTexture('textures/ball.jpg');
+}
+
+// Init game
+function initGame() {
     // Scene
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -81,7 +102,7 @@ function init() {
     camera.rotation.x = -5 * Math.PI / 180;
 
     if (debug) {
-        const controls = new OrbitControls( camera );
+        const controls = new THREE.OrbitControls( camera );
         controls.addEventListener( 'change', render );
     }
 
@@ -102,6 +123,14 @@ function init() {
     });
 
     /* Events */
+    // Prevent F11 to toggle fullscreen, go to video options instead
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode === 122) {
+            event.preventDefault();
+            screenManager.goTo('optionsMenu').goTo('videoMenu');
+        }
+    });
+
     // End game event listener
     window.addEventListener("endGame", function(e) {
         screenManager.displayFlashMessage(e.detail.message);
@@ -112,6 +141,33 @@ function init() {
 
     // Score event listener
     window.addEventListener("score", updateScoreUI);
+
+    // Video menu is displayed, listen keyboard event on inputs
+    screenManager.on("videoMenu", function() {
+        const onChange = function (e) {
+            const input = e.srcElement;
+            const value = input.value;
+            const name = input.getAttribute('data-parameter');
+
+            // Fullscreen
+            if (name === 'fullscreen' && screenfull.enabled) {
+                screenfull.toggle();
+                return;
+            }
+
+            rules.config[name] = value;
+            input.value = value;
+        };
+
+        _.forEach(videoParameterElements, function (item) {
+            const parameter = item.getAttribute('data-parameter');
+            item.value = rules.config[parameter];
+
+            if (_.isNull(item.onchange)) {
+                item.onchange = onChange;
+            }
+        });
+    });
 
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function() {
@@ -219,7 +275,7 @@ function updateRulesUI(rules) {
 function updateScoreUI(event) {
     const winSide = event.detail.side,
         scores = event.detail.scores
-    ;
+        ;
 
     scoreLeftDisplay.textContent = scores.left;
     scoreRightDisplay.textContent = scores.right;
@@ -258,3 +314,4 @@ function render() {
 window.newParty = newParty;
 window.pauseGame = pauseGame;
 window.screenManager = screenManager;
+window.assetManager = assetManager;
