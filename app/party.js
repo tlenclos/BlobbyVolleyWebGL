@@ -127,6 +127,7 @@ export default class Party {
     }
 
     afterScoring (winSide) {
+        this.playingSide = null;
         let resetObjects = true;
 
         // Internal pause
