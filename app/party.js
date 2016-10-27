@@ -1,5 +1,6 @@
 import THREE from 'three';
 import _ from 'lodash';
+import p2 from 'p2';
 
 import Ball from './ball';
 import Blob from './blob';
@@ -94,6 +95,9 @@ export default class Party {
         // Ball
         this.ball = new Ball(this.physics.getWorld(), 0xff000, [-5, 5]);
 
+        // Declare interactions between materials
+        this._declareMaterialsInteractions();
+
         // Serving side
         this.servingSide = 'left';
 
@@ -182,7 +186,7 @@ export default class Party {
         return this.paused;
     }
 
-    update () {
+    update (fixedTimeStep, deltaTime, maxSubSteps) {
         if (this.paused || !this.inProgress) {
             return;
         }
@@ -195,7 +199,7 @@ export default class Party {
         }
 
         this.ball.physics();
-        this.physics.step();
+        this.physics.step(fixedTimeStep, deltaTime, maxSubSteps);
     }
 
     applyRules () {
@@ -246,5 +250,51 @@ export default class Party {
 
     incrementScore (side) {
         this.scores[side]++;
+    }
+
+    _declareMaterialsInteractions () {
+        const world = this.physics.getWorld();
+
+        _.each(this.players, (player) => {
+            // Interaction blob vs ball
+            world.addContactMaterial(
+                new p2.ContactMaterial(
+                    player.blob.material,
+                    this.ball.material,
+                    {
+                        friction: 0,
+                        restitution: 1.1
+                    }
+                )
+            );
+
+            // Interaction blob vs ground
+            world.addContactMaterial(
+                new p2.ContactMaterial(
+                    player.blob.material,
+                    this.field.materials[0],
+                    {
+                        friction: 2,
+                        restitution: 0
+                    }
+                )
+            );
+
+            // TODO Interaction blob vs walls/net
+        });
+
+        // Interaction ball vs ground/walls/net
+        _.each(this.field.materials, (material) => {
+            world.addContactMaterial(
+                new p2.ContactMaterial(
+                    this.ball.material,
+                    material,
+                    {
+                        friction: 0,
+                        restitution: 1
+                    }
+                )
+            );
+        });
     }
 }

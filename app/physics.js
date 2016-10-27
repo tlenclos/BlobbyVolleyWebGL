@@ -1,8 +1,5 @@
 import _ from 'lodash';
-import Box2D from './libs/Box2dWeb-2.1.a.3';
-
-const b2Vec2 = Box2D.Common.Math.b2Vec2,
-    b2World = Box2D.Dynamics.b2World;
+import p2 from 'p2';
 
 export default class Physics {
     constructor (gravity) {
@@ -13,23 +10,16 @@ export default class Physics {
     }
 
     init () {
-        this.world = new b2World(
-            new b2Vec2(0, -this.gravity),
-            true
-        );
+        this.world = new p2.World({
+            gravity: [0, -this.gravity]
+        });
     }
 
     getWorld () {
         return this.world;
     }
 
-    step () {
-        this.world.Step(
-            window.dt,
-            10,
-            10
-        );
-
-        this.world.ClearForces();
+    step (fixedTimeStep, deltaTime, maxSubSteps) {
+        this.world.step(fixedTimeStep, deltaTime, maxSubSteps);
     }
 }
