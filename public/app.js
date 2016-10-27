@@ -1158,7 +1158,7 @@ function initGame() {
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function () {
         var keydownOnInputControl = function keydownOnInputControl(e) {
-            var input = e.srcElement;
+            var input = e.target;
             var player = parseInt(input.getAttribute('data-player'));
             var controlName = input.getAttribute('data-control');
             var keyTextValue = _keycodeDictionary2.default[e.keyCode];
