@@ -626,13 +626,13 @@ var Field = function () {
             net = void 0,
             bg = void 0;
 
-        ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 0.5, 20, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
+        ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
 
-        leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 0.5, this.height * 2, 20, null, 0xDEDEDE, 0);
+        leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
 
-        rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 0.5, this.height * 2, 20, null, 0xDEDEDE, 0);
+        rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
 
-        net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.15, this.height / 2, 20, null, 0xDEDEDE, 0.8);
+        net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20, null, 0xDEDEDE, 0.8);
 
         // Background
         bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: window.assetManager.get('textures.background') }));
@@ -646,7 +646,7 @@ var Field = function () {
     Field.prototype.createWall = function createWall(x, y, width, height, depth, texture, color, opacity, userData) {
         var body = new _p2.default.Body({
             mass: 0,
-            position: [x, y] // FIXME Bug on y for ground with blob
+            position: [x, y]
         });
 
         if (typeof userData !== 'undefined') {
@@ -668,7 +668,7 @@ var Field = function () {
 
         this.world.addBody(body);
 
-        var geometry = width > height ? new _three2.default.BoxGeometry(width, height * 2, _lodash2.default.isNumber(depth) ? depth : 0) : new _three2.default.BoxGeometry(width * 2, height, _lodash2.default.isNumber(depth) ? depth : 0);
+        var geometry = width > height ? new _three2.default.BoxGeometry(width, height, _lodash2.default.isNumber(depth) ? depth : 0) : new _three2.default.BoxGeometry(width, height, _lodash2.default.isNumber(depth) ? depth : 0);
 
         var material = void 0;
 

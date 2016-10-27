@@ -24,7 +24,7 @@ export default class Field {
             this.x,
             this.y - (this.height / 2) - 0.5,
             this.width,
-            0.5,
+            1,
             20,
             window.assetManager.get('textures.wood'),
             0xEEEEEE,
@@ -35,7 +35,7 @@ export default class Field {
         leftWall = this.createWall(
             this.x - (this.width / 2) - 0.5,
             this.y + (this.height / 2),
-            0.5,
+            1,
             this.height * 2,
             20,
             null,
@@ -46,7 +46,7 @@ export default class Field {
         rightWall = this.createWall(
             this.x + (this.width / 2) + 0.5,
             this.y + (this.height / 2),
-            0.5,
+            1,
             this.height * 2,
             20,
             null,
@@ -57,7 +57,7 @@ export default class Field {
         net = this.createWall(
             this.x,
             this.y - (this.height / 2) + (this.height / 4),
-            0.15,
+            0.3,
             this.height / 2,
             20,
             null,
@@ -80,7 +80,7 @@ export default class Field {
     createWall (x, y, width, height, depth, texture, color, opacity, userData) {
         const body = new p2.Body({
             mass: 0,
-            position: [x, y] // FIXME Bug on y for ground with blob
+            position: [x, y]
         });
 
         if (typeof userData !== 'undefined') {
@@ -103,8 +103,8 @@ export default class Field {
         this.world.addBody(body);
 
         const geometry = width > height
-                ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
-                : new THREE.BoxGeometry(width * 2, height, _.isNumber(depth) ? depth : 0)
+                ? new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0)
+                : new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0)
             ;
 
         let material;
