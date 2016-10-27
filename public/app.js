@@ -1925,6 +1925,12 @@ require.register("sound.js", function(exports, require, module) {
 
 exports.__esModule = true;
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Sound = function () {
@@ -1933,6 +1939,7 @@ var Sound = function () {
 
         this.sources = sources;
         this.audio = null;
+        this.play = _lodash2.default.throttle(this._play.bind(this), 100, { leading: true });
 
         this.init();
     }
@@ -1951,7 +1958,7 @@ var Sound = function () {
         return this.audio;
     };
 
-    Sound.prototype.play = function play(restart) {
+    Sound.prototype._play = function _play(restart) {
         if (restart === true && this.audio.currentTime > 0) {
             this.stop();
         }
