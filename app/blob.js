@@ -1,11 +1,5 @@
-import Box2D from './libs/Box2dWeb-2.1.a.3';
 import THREE from 'three';
-
-const b2Vec2 = Box2D.Common.Math.b2Vec2,
-    b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-    b2BodyDef = Box2D.Dynamics.b2BodyDef,
-    b2Body = Box2D.Dynamics.b2Body,
-    b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+import p2 from 'p2';
 
 export default class Blob {
     constructor (world, color, spawnPosition) {
@@ -13,28 +7,72 @@ export default class Blob {
         this.color = color;
         this.spawnPosition = spawnPosition;
         this.fixture = null;
+        this.material = null;
         this.threeObject = null;
         this.radius = 1;
         this.speed = 5;
         this.jumpAllowed = false;
+        this._isTouchingGround = false;
+        this._isTouchingBall = false;
 
         this.init();
     }
 
     init () {
-        const fixDef = new b2FixtureDef;
-        fixDef.density = 100;
-        fixDef.friction = 1;
-        fixDef.restitution = 0;
-        fixDef.shape = new b2CircleShape(this.radius);
+        const body = new p2.Body({
+            mass: 100,
+            fixedRotation: true,
+            position: this.spawnPosition
+        });
 
-        const bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_dynamicBody;
-        bodyDef.fixedRotation = true;
-        bodyDef.position.x = this.spawnPosition[0];
-        bodyDef.position.y = this.spawnPosition[1];
+        const shape = new p2.Circle({
+            radius: this.radius
+        });
 
-        this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
+        body.addShape(shape);
+        body.setDensity(100);
+
+        this.material = new p2.Material();
+        shape.material = this.material;
+
+        this.world.addBody(body);
+        this.fixture = body;
+
+        this.world.on('beginContact', function (event) {
+            if (event.bodyA !== body && event.bodyB !== body) {
+                return;
+            }
+
+            if (
+                event.bodyA.userData === 'type_ground' ||
+                event.bodyB.userData === 'type_ground'
+            ) {
+                this._isTouchingGround = true;
+            } else if (
+                event.bodyA.userData === 'type_ball' ||
+                event.bodyB.userData === 'type_ball'
+            ) {
+                this._isTouchingBall = true;
+            }
+        }.bind(this));
+
+        this.world.on('endContact', function (event) {
+            if (event.bodyA !== body && event.bodyB !== body) {
+                return;
+            }
+
+            if (
+                event.bodyA.userData === 'type_ground' ||
+                event.bodyB.userData === 'type_ground'
+            ) {
+                this._isTouchingGround = false;
+            } else if (
+                event.bodyA.userData === 'type_ball' ||
+                event.bodyB.userData === 'type_ball'
+            ) {
+                this._isTouchingBall = false;
+            }
+        }.bind(this));
 
         const geometry = new THREE.CylinderGeometry(this.radius, this.radius, 1, 7, 1, false);
         const material = new THREE.MeshBasicMaterial({ color: this.color });
@@ -55,23 +93,20 @@ export default class Blob {
 
         // Horizontal move
         if (x !== 0) {
-            const body = this.fixture.GetBody(),
-                vel = body.GetLinearVelocity(),
-                velDelta = (this.speed * x) - vel.x,
-                force = body.GetMass() * velDelta / (window.dt)
-                ;
+            const body = this.fixture,
+                vel = body.velocity,
+                velDelta = (this.speed * x) - vel[0],
+                force = body.mass * velDelta / (1 / 60); // TODO 1/60 could change (see main)
 
-            body.ApplyForce(
-                new b2Vec2(force, 0),
-                body.GetDefinition().position
+            body.applyForce(
+                [force, 0]
             );
         }
     }
 
     handleJump () {
-        const body = this.fixture.GetBody(),
-            yVelocity = body.GetLinearVelocity().y
-            ;
+        const body = this.fixture,
+            yVelocity = body.velocity[1];
 
         // Allow jumping
         if (!this.jumpAllowed && yVelocity < 0.00001 && this.isTouchingGround()) {
@@ -80,9 +115,8 @@ export default class Blob {
 
         // Jumping
         if (this.jumpAllowed) {
-            body.ApplyImpulse(
-                new b2Vec2(0, 9 * this.fixture.GetBody().GetMass()),
-                body.GetDefinition().position
+            body.applyImpulse(
+                p2.vec2.fromValues(0, 9 * this.fixture.mass)
             );
 
             // Prevent jumping
@@ -91,49 +125,21 @@ export default class Blob {
     }
 
     isTouchingGround () {
-        let contacts = this.fixture.GetBody().GetContactList(),
-            groundContact,
-            isTouchingGround = false
-            ;
-
-        while (typeof groundContact === 'undefined' && contacts !== null) {
-            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {
-                groundContact = contacts.contact;
-                isTouchingGround = groundContact.IsTouching();
-            }
-
-            contacts = contacts.next;
-        }
-
-        return isTouchingGround;
+        return this._isTouchingGround;
     }
 
     isTouchingBall () {
-        let contacts = this.fixture.GetBody().GetContactList(),
-            ballContact,
-            isTouchingBall = false
-            ;
-
-        while (typeof ballContact === 'undefined' && contacts !== null) {
-            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ball') {
-                ballContact = contacts.contact;
-                isTouchingBall = ballContact.IsTouching();
-            }
-
-            contacts = contacts.next;
-        }
-
-        return isTouchingBall;
+        return this._isTouchingBall;
     }
 
     physics () {
-        const pos = this.fixture.GetBody().GetDefinition().position;
-        this.threeObject.position.x = pos.x;
-        this.threeObject.position.y = pos.y;
+        const pos = this.fixture.position;
+        this.threeObject.position.x = pos[0];
+        this.threeObject.position.y = pos[1];
     }
 
     moveTo (position) {
-        this.fixture.GetBody().SetPosition(new b2Vec2(position[0], position[1]));
-        this.fixture.GetBody().SetLinearVelocity(new b2Vec2(0, 0));
+        this.fixture.position = position;
+        this.fixture.velocity = [0, 0];
     }
 }

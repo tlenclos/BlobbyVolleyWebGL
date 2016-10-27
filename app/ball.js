@@ -1,12 +1,6 @@
 import THREE from 'three';
 import Sound from './sound';
-import Box2D from './libs/Box2dWeb-2.1.a.3';
-
-const b2Vec2 = Box2D.Common.Math.b2Vec2,
-    b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-    b2BodyDef = Box2D.Dynamics.b2BodyDef,
-    b2Body = Box2D.Dynamics.b2Body,
-    b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+import p2 from 'p2';
 
 export default class Ball {
     constructor (world, color, spawnPosition) {
@@ -16,30 +10,65 @@ export default class Ball {
         this.radius = 1.1; // TODO : If we reduce the radius the ball can be stuck against a wall and the blob can't move it
         this.maxSpeed = 12;
         this.fixture = null;
+        this.material = null;
         this.threeObject = null;
         this.sound = null;
+        this._isHavingContact = false;
+        this._isTouchingGround = false;
 
         this.init();
     }
 
-    getFixture () {
-        return this.fixture;
-    }
-
     init () {
-        const fixDef = new b2FixtureDef;
-        fixDef.density = 1.0;
-        fixDef.friction = 0;
-        fixDef.restitution = 1;
-        fixDef.shape = new b2CircleShape(this.radius);
+        const body = new p2.Body({
+            mass: 1,
+            position: this.spawnPosition
+        });
 
-        const bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_dynamicBody;
-        bodyDef.position.x = this.spawnPosition[0];
-        bodyDef.position.y = this.spawnPosition[1];
-        bodyDef.userData = 'type_ball';
+        body.userData = 'type_ball';
 
-        this.fixture = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
+        const shape = new p2.Circle({
+            radius: this.radius
+        });
+
+        body.addShape(shape);
+        body.setDensity(1);
+
+        this.material = new p2.Material();
+        shape.material = this.material;
+
+        this.world.addBody(body);
+        this.fixture = body;
+
+        this.world.on('beginContact', function (event) {
+            if (event.bodyA !== body && event.bodyB !== body) {
+                return;
+            }
+
+            this._isHavingContact = true;
+
+            if (
+                event.bodyA.userData === 'type_ground' ||
+                event.bodyB.userData === 'type_ground'
+            ) {
+                this._isTouchingGround = true;
+            }
+        }.bind(this));
+
+        this.world.on('endContact', function (event) {
+            if (event.bodyA !== body && event.bodyB !== body) {
+                return;
+            }
+
+            this._isHavingContact = false;
+
+            if (
+                event.bodyA.userData === 'type_ground' ||
+                event.bodyB.userData === 'type_ground'
+            ) {
+                this._isTouchingGround = false;
+            }
+        }.bind(this));
 
         const texture = window.assetManager.get('textures.ball');
         const geometry = new THREE.SphereGeometry(this.radius, 64, 64);
@@ -54,24 +83,25 @@ export default class Ball {
         this.sound = new Sound(['sounds/ball.mp3', 'sounds/ball.ogg']);
     }
 
+    getFixture () {
+        return this.fixture;
+    }
+
     physics () {
-        const body = this.fixture.GetBody(),
-            pos = body.GetDefinition().position,
-            velocity = body.GetLinearVelocity(),
-            speed = velocity.Length()
-            ;
+        const body = this.fixture,
+            pos = body.position,
+            velocity = body.velocity,
+            speed = p2.vec2.length(velocity);
 
         if (speed > this.maxSpeed) {
-            body.SetLinearVelocity(
-                new b2Vec2(
-                    this.maxSpeed / speed * velocity.x,
-                    this.maxSpeed / speed * velocity.y
-                )
-            );
+            body.velocity = [
+                this.maxSpeed / speed * velocity[0],
+                this.maxSpeed / speed * velocity[1]
+            ];
         }
 
-        this.threeObject.position.x = pos.x;
-        this.threeObject.position.y = pos.y;
+        this.threeObject.position.x = pos[0];
+        this.threeObject.position.y = pos[1];
 
         if (this.hasTouchingContact()) {
             this.sound.play(true);
@@ -79,38 +109,15 @@ export default class Ball {
     }
 
     hasTouchingContact () {
-        let touching = false,
-            contacts = this.fixture.GetBody().GetContactList()
-            ;
-
-        while (touching === false && contacts !== null) {
-            touching = contacts.contact.IsTouching();
-            contacts = contacts.next;
-        }
-
-        return touching;
+        return this._isHavingContact;
     }
 
     isTouchingGround () {
-        let contacts = this.fixture.GetBody().GetContactList(),
-            groundContact,
-            isTouchingGround = false
-            ;
-
-        while (typeof groundContact === 'undefined' && contacts !== null) {
-            if (contacts.contact.GetFixtureA().GetBody().GetUserData() === 'type_ground') {
-                groundContact = contacts.contact;
-                isTouchingGround = groundContact.IsTouching();
-            }
-
-            contacts = contacts.next;
-        }
-
-        return isTouchingGround;
+        return this._isTouchingGround;
     }
 
     moveTo (position) {
-        this.fixture.GetBody().SetPosition(new b2Vec2(position[0], position[1]));
-        this.fixture.GetBody().SetLinearVelocity(new b2Vec2(0, 0));
+        this.fixture.position = position;
+        this.fixture.velocity = [0, 0];
     }
 }

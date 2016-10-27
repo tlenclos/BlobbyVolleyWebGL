@@ -1,11 +1,6 @@
 import THREE from 'three';
 import _ from 'lodash';
-import Box2D from './libs/Box2dWeb-2.1.a.3';
-
-const b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
-    b2BodyDef = Box2D.Dynamics.b2BodyDef,
-    b2Body = Box2D.Dynamics.b2Body,
-    b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+import p2 from 'p2';
 
 export default class Field {
     constructor (world, x, y, width, height) {
@@ -17,6 +12,7 @@ export default class Field {
         this.position = { x: x, y: y };
         this.dims = [width, height];
         this.parts = [];
+        this.materials = [];
 
         this.init();
     }
@@ -30,9 +26,6 @@ export default class Field {
             this.width,
             0.5,
             20,
-            null,
-            2,
-            null,
             window.assetManager.get('textures.wood'),
             0xEEEEEE,
             null,
@@ -46,9 +39,6 @@ export default class Field {
             this.height * 2,
             20,
             null,
-            0,
-            null,
-            null,
             0xDEDEDE,
             0
         );
@@ -60,9 +50,6 @@ export default class Field {
             this.height * 2,
             20,
             null,
-            0,
-            null,
-            null,
             0xDEDEDE,
             0
         );
@@ -73,9 +60,6 @@ export default class Field {
             0.15,
             this.height / 2,
             20,
-            null,
-            0,
-            null,
             null,
             0xDEDEDE,
             0.8
@@ -93,31 +77,30 @@ export default class Field {
         this.parts.push(ground, leftWall, rightWall, net, bg);
     }
 
-    createWall (x, y, width, height, depth, density, friction, restitution, texture, color, opacity, userData) {
-        const bodyDef = new b2BodyDef;
-        bodyDef.type = b2Body.b2_staticBody;
-        bodyDef.position.x = x;
-        bodyDef.position.y = y;
-
-        const fixDef = new b2FixtureDef;
-        fixDef.density = _.isNumber(density) ? density : 1;
-        fixDef.friction = _.isNumber(friction) ? friction : 0.5;
-        fixDef.restitution = _.isNumber(restitution) ? restitution : 0;
-        fixDef.shape = new b2PolygonShape;
-
-        if (width > height) {
-            fixDef.shape.SetAsBox(width / 2, height);
-        } else {
-            fixDef.shape.SetAsBox(width, height / 2);
-        }
-
-        const body = this.world.CreateBody(bodyDef);
+    createWall (x, y, width, height, depth, texture, color, opacity, userData) {
+        const body = new p2.Body({
+            mass: 0,
+            position: [x, y] // FIXME Bug on y for ground with blob
+        });
 
         if (typeof userData !== 'undefined') {
-            body.SetUserData(userData);
+            body.userData = userData;
         }
 
-        body.CreateFixture(fixDef);
+        const shape = new p2.Box({
+            width: width,
+            height: height
+        });
+
+        body.addShape(shape);
+        body.setDensity(1);
+
+        const physicsMaterial = new p2.Material();
+
+        shape.material = physicsMaterial;
+        this.materials.push(physicsMaterial);
+
+        this.world.addBody(body);
 
         const geometry = width > height
                 ? new THREE.BoxGeometry(width, height * 2, _.isNumber(depth) ? depth : 0)
@@ -143,8 +126,8 @@ export default class Field {
             geometry,
             material
         );
-        mesh.position.x = bodyDef.position.x;
-        mesh.position.y = bodyDef.position.y;
+        mesh.position.x = body.position[0];
+        mesh.position.y = body.position[1];
 
         return mesh;
     }

@@ -12,7 +12,10 @@ import AssetManager from './assetManager';
 const OrbitControls = require('three-orbit-controls')(THREE);
 
 // Variables
-let camera, scene, renderer, stats, container, oldTime,
+const fixedTimeStep = 1 / 60;
+const maxSubSteps = 10;
+let lastTime;
+let camera, scene, renderer, stats, container,
     party,
     screens = {
         "loadingMenu": document.getElementById("loadingMenu"),
@@ -285,15 +288,14 @@ function updateScoreUI(event) {
 
 // Animation loop
 function renderLoop(time) {
-    // Sync physics with time
-    window.dt = ((time - oldTime) / 1000) || window.dt; // FIXME Do not store dt into window
-    oldTime = time;
-
-    party.update();
-
     request = requestAnimationFrame(renderLoop);
 
-    // update the stats
+    // Sync physics with time (compute elapsed time since last render frame)
+    var deltaTime = lastTime ? (time - lastTime) / 1000 : 0;
+
+    party.update(fixedTimeStep, deltaTime, maxSubSteps);
+
+    // Update stats
     stats.update();
 
     renderer.render(scene, camera);
@@ -305,9 +307,7 @@ function render() {
         cancelAnimationFrame(request);
     }
 
-    window.dt = 1 / 60;
-
-    renderLoop();
+    request = requestAnimationFrame(renderLoop);
 }
 
 // FIXME Do not store into window

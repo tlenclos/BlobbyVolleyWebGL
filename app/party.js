@@ -1,5 +1,6 @@
 import THREE from 'three';
 import _ from 'lodash';
+import p2 from 'p2';
 
 import Ball from './ball';
 import Blob from './blob';
@@ -94,6 +95,59 @@ export default class Party {
         // Ball
         this.ball = new Ball(this.physics.getWorld(), 0xff000, [-5, 5]);
 
+        // Contact blob / ball
+        const blob1BallMaterial = new p2.ContactMaterial(this.players[0].blob.material, this.ball.material, {
+            friction: 0,
+            restitution: 1.1
+        });
+        this.physics.getWorld().addContactMaterial(blob1BallMaterial);
+
+        const blob2BallMaterial = new p2.ContactMaterial(this.players[1].blob.material, this.ball.material, {
+            friction: 0,
+            restitution: 1.1
+        });
+        this.physics.getWorld().addContactMaterial(blob2BallMaterial);
+
+        // Contact blob / field
+        const blob1GroundMaterial = new p2.ContactMaterial(this.players[0].blob.material, this.field.materials[0], {
+            friction: 2,
+            restitution: 0
+        });
+        this.physics.getWorld().addContactMaterial(blob1GroundMaterial);
+
+        const blob2GroundMaterial = new p2.ContactMaterial(this.players[1].blob.material, this.field.materials[0], {
+            friction: 2,
+            restitution: 0
+        });
+        this.physics.getWorld().addContactMaterial(blob2GroundMaterial);
+
+        // TODO blob vs walls/net
+
+        // Contact ball / field
+        const ballGroundMaterial = new p2.ContactMaterial(this.ball.material, this.field.materials[0], {
+            friction: 0,
+            restitution: 1
+        });
+        this.physics.getWorld().addContactMaterial(ballGroundMaterial);
+
+        const ballLeftWallMaterial = new p2.ContactMaterial(this.ball.material, this.field.materials[1], {
+            friction: 0,
+            restitution: 1
+        });
+        this.physics.getWorld().addContactMaterial(ballLeftWallMaterial);
+
+        const ballRightWallMaterial = new p2.ContactMaterial(this.ball.material, this.field.materials[2], {
+            friction: 0,
+            restitution: 1
+        });
+        this.physics.getWorld().addContactMaterial(ballRightWallMaterial);
+
+        const ballNetMaterial = new p2.ContactMaterial(this.ball.material, this.field.materials[3], {
+            friction: 0,
+            restitution: 1
+        });
+        this.physics.getWorld().addContactMaterial(ballNetMaterial);
+
         // Serving side
         this.servingSide = 'left';
 
@@ -182,7 +236,7 @@ export default class Party {
         return this.paused;
     }
 
-    update () {
+    update (fixedTimeStep, deltaTime, maxSubSteps) {
         if (this.paused || !this.inProgress) {
             return;
         }
@@ -195,7 +249,7 @@ export default class Party {
         }
 
         this.ball.physics();
-        this.physics.step();
+        this.physics.step(fixedTimeStep, deltaTime, maxSubSteps);
     }
 
     applyRules () {
