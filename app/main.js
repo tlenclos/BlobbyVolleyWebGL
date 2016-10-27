@@ -148,7 +148,7 @@ function initGame() {
     // Video menu is displayed, listen keyboard event on inputs
     screenManager.on("videoMenu", function() {
         const onChange = function (e) {
-            const input = e.srcElement;
+            const input = e.target;
             const value = input.value;
             const name = input.getAttribute('data-parameter');
 
@@ -175,7 +175,7 @@ function initGame() {
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function() {
         const keydownOnInputControl = function(e) {
-            const input = e.srcElement;
+            const input = e.target;
             const player = parseInt(input.getAttribute('data-player'));
             const controlName = input.getAttribute('data-control');
             const keyTextValue = keycodeDictionary[e.keyCode];
@@ -208,7 +208,7 @@ function initGame() {
     // Rules menu is displayed, listen keyboard event on inputs
     screenManager.on("rulesMenu", function() {
         const keydownOnInputControl = function(e) {
-            const input = e.srcElement;
+            const input = e.target;
             const ruleValue = parseInt(input.value);
             const ruleName = input.getAttribute('data-ruleName');
             rules.config[ruleName] = ruleValue;

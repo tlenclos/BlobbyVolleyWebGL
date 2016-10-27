@@ -1131,7 +1131,7 @@ function initGame() {
     // Video menu is displayed, listen keyboard event on inputs
     screenManager.on("videoMenu", function () {
         var onChange = function onChange(e) {
-            var input = e.srcElement;
+            var input = e.target;
             var value = input.value;
             var name = input.getAttribute('data-parameter');
 
@@ -1191,7 +1191,7 @@ function initGame() {
     // Rules menu is displayed, listen keyboard event on inputs
     screenManager.on("rulesMenu", function () {
         var keydownOnInputControl = function keydownOnInputControl(e) {
-            var input = e.srcElement;
+            var input = e.target;
             var ruleValue = parseInt(input.value);
             var ruleName = input.getAttribute('data-ruleName');
             rules.config[ruleName] = ruleValue;
