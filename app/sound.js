@@ -1,7 +1,10 @@
+import _ from 'lodash';
+
 export default class Sound {
     constructor (sources) {
         this.sources = sources;
         this.audio = null;
+        this.play = _.throttle(this._play.bind(this), 100, { leading: true });
 
         this.init();
     }
@@ -20,7 +23,7 @@ export default class Sound {
        return this.audio;
     }
 
-    play (restart) {
+    _play (restart) {
         if (restart === true && this.audio.currentTime > 0) {
             this.stop();
         }
