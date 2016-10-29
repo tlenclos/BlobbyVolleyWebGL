@@ -716,238 +716,48 @@ module.exports = exports['default'];
 
 });
 
-require.register("keycodeDictionary.js", function(exports, require, module) {
-"use strict";
+require.register("keyboardState.js", function(exports, require, module) {
+'use strict';
 
 exports.__esModule = true;
-exports.default = {
-    0: "\\",
-    8: "backspace",
-    9: "tab",
-    12: "num",
-    13: "enter",
-    16: "shift",
-    17: "ctrl",
-    18: "alt",
-    19: "pause",
-    20: "caps",
-    27: "esc",
-    32: "space",
-    33: "pageup",
-    34: "pagedown",
-    35: "end",
-    36: "home",
-    37: "left",
-    38: "up",
-    39: "right",
-    40: "down",
-    44: "print",
-    45: "insert",
-    46: "delete",
-    48: "0",
-    49: "1",
-    50: "2",
-    51: "3",
-    52: "4",
-    53: "5",
-    54: "6",
-    55: "7",
-    56: "8",
-    57: "9",
-    65: "a",
-    66: "b",
-    67: "c",
-    68: "d",
-    69: "e",
-    70: "f",
-    71: "g",
-    72: "h",
-    73: "i",
-    74: "j",
-    75: "k",
-    76: "l",
-    77: "m",
-    78: "n",
-    79: "o",
-    80: "p",
-    81: "q",
-    82: "r",
-    83: "s",
-    84: "t",
-    85: "u",
-    86: "v",
-    87: "w",
-    88: "x",
-    89: "y",
-    90: "z",
-    91: "cmd",
-    92: "cmd",
-    93: "cmd",
-    96: "num_0",
-    97: "num_1",
-    98: "num_2",
-    99: "num_3",
-    100: "num_4",
-    101: "num_5",
-    102: "num_6",
-    103: "num_7",
-    104: "num_8",
-    105: "num_9",
-    106: "num_multiply",
-    107: "num_add",
-    108: "num_enter",
-    109: "num_subtract",
-    110: "num_decimal",
-    111: "num_divide",
-    124: "print",
-    144: "num",
-    145: "scroll",
-    186: ";",
-    187: "=",
-    188: ",",
-    189: "-",
-    190: ".",
-    191: "/",
-    192: "`",
-    219: "[",
-    220: "\\",
-    221: "]",
-    222: "\'",
-    223: "`",
-    224: "cmd",
-    225: "alt",
-    57392: "ctrl",
-    63289: "num"
-};
-module.exports = exports["default"];
 
-});
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-require.register("libs/THREEx.KeyboardState.js", function(exports, require, module) {
-"use strict";
+var KeyboardState = function () {
+    function KeyboardState(element) {
+        _classCallCheck(this, KeyboardState);
 
-exports.__esModule = true;
-// THREEx.KeyboardState.js keep the current state of the keyboard.
-// It is possible to query it at any time. No need of an event.
-// This is particularly convenient in loop driven case, like in
-// 3D demos or games.
-//
-// # Usage
-//
-// **Step 1**: Create the object
-//
-// ```var keyboard	= new THREEx.KeyboardState();```
-//
-// **Step 2**: Query the keyboard state
-//
-// This will return true if shift and A are pressed, false otherwise
-//
-// ```keyboard.pressed("shift+A")```
-//
-// **Step 3**: Stop listening to the keyboard
-//
-// ```keyboard.destroy()```
-//
-// NOTE: this library may be nice as standaline. independant from three.js
-// - rename it keyboardForGame
-//
-// # Code
-//
+        this.target = element || document;
+        this.pressedKeys = new Set();
+        this._onKeydownBound = this._onKeydown.bind(this);
+        this._onKeyupBound = this._onKeyup.bind(this);
 
-/** @namespace */
-var THREEx = THREEx || {};
+        this.target.addEventListener('keydown', this._onKeydownBound, false);
+        this.target.addEventListener('keyup', this._onKeyupBound, false);
+    }
 
-/**
- * - NOTE: it would be quite easy to push event-driven too
- *   - microevent.js for events handling
- *   - in this._onkeyChange, generate a string from the DOM event
- *   - use this as event name
-*/
-THREEx.KeyboardState = function () {
-	// to store the current state
-	this.keyCodes = {};
-	this.modifiers = {};
+    KeyboardState.prototype._onKeydown = function _onKeydown(event) {
+        this.pressedKeys.add(event.key);
+    };
 
-	// create callback to bind/unbind keyboard events
-	var self = this;
-	this._onKeyDown = function (event) {
-		self._onKeyChange(event, true);
-	};
-	this._onKeyUp = function (event) {
-		self._onKeyChange(event, false);
-	};
+    KeyboardState.prototype._onKeyup = function _onKeyup(event) {
+        this.pressedKeys.delete(event.key);
+    };
 
-	// bind keyEvents
-	document.addEventListener("keydown", this._onKeyDown, false);
-	document.addEventListener("keyup", this._onKeyUp, false);
-};
+    KeyboardState.prototype.pressed = function pressed(key) {
+        return this.pressedKeys.has(key);
+    };
 
-/**
- * To stop listening of the keyboard events
-*/
-THREEx.KeyboardState.prototype.destroy = function () {
-	// unbind keyEvents
-	document.removeEventListener("keydown", this._onKeyDown, false);
-	document.removeEventListener("keyup", this._onKeyUp, false);
-};
+    KeyboardState.prototype.destroy = function destroy() {
+        this.target.removeEventListener('keydown', this._onKeydownBound, false);
+        this.target.removeEventListener('keyup', this._onKeyupBound, false);
+    };
 
-THREEx.KeyboardState.MODIFIERS = ['shift', 'ctrl', 'alt', 'meta'];
-THREEx.KeyboardState.ALIAS = {
-	'left': 37,
-	'up': 38,
-	'right': 39,
-	'down': 40,
-	'space': 32,
-	'pageup': 33,
-	'pagedown': 34,
-	'enter': 13,
-	'tab': 9,
-	'escape': 27
-};
+    return KeyboardState;
+}();
 
-/**
- * to process the keyboard dom event
-*/
-THREEx.KeyboardState.prototype._onKeyChange = function (event, pressed) {
-	// log to debug
-	//console.log("onKeyChange", event, pressed, event.keyCode, event.shiftKey, event.ctrlKey, event.altKey, event.metaKey)
-
-	// update this.keyCodes
-	var keyCode = event.keyCode;
-	this.keyCodes[keyCode] = pressed;
-
-	// update this.modifiers
-	this.modifiers['shift'] = event.shiftKey;
-	this.modifiers['ctrl'] = event.ctrlKey;
-	this.modifiers['alt'] = event.altKey;
-	this.modifiers['meta'] = event.metaKey;
-};
-
-/**
- * query keyboard state to know if a key is pressed of not
- *
- * @param {String} keyDesc the description of the key. format : modifiers+key e.g shift+A
- * @returns {Boolean} true if the key is pressed, false otherwise
-*/
-THREEx.KeyboardState.prototype.pressed = function (keyDesc) {
-	var keys = keyDesc.split("+");
-	for (var i = 0; i < keys.length; i++) {
-		var key = keys[i];
-		var pressed;
-		if (THREEx.KeyboardState.MODIFIERS.indexOf(key) !== -1) {
-			pressed = this.modifiers[key];
-		} else if (Object.keys(THREEx.KeyboardState.ALIAS).indexOf(key) != -1) {
-			pressed = this.keyCodes[THREEx.KeyboardState.ALIAS[key]];
-		} else {
-			pressed = this.keyCodes[key.toUpperCase().charCodeAt(0)];
-		}
-		if (!pressed) return false;
-	};
-	return true;
-};
-
-exports.default = THREEx.KeyboardState;
-module.exports = exports["default"];
+exports.default = KeyboardState;
+module.exports = exports['default'];
 
 });
 
@@ -985,10 +795,6 @@ var _party2 = _interopRequireDefault(_party);
 var _rules = require('./rules');
 
 var _rules2 = _interopRequireDefault(_rules);
-
-var _keycodeDictionary = require('./keycodeDictionary');
-
-var _keycodeDictionary2 = _interopRequireDefault(_keycodeDictionary);
 
 var _assetManager = require('./assetManager');
 
@@ -1035,9 +841,9 @@ var camera = void 0,
     'right': 'd',
     'left': 'q'
 }, {
-    'up': 'up',
-    'right': 'right',
-    'left': 'left'
+    'up': 'ArrowUp',
+    'right': 'ArrowRight',
+    'left': 'ArrowLeft'
 }],
     rules = new _rules2.default(),
     debug = false;
@@ -1158,20 +964,22 @@ function initGame() {
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function () {
         var keydownOnInputControl = function keydownOnInputControl(e) {
+            // Allow keyboard navigation
+            if (_lodash2.default.includes(['Tab', 'Shift'], e.key)) {
+                return;
+            }
+
             var input = e.target;
             var player = parseInt(input.getAttribute('data-player'));
             var controlName = input.getAttribute('data-control');
-            var keyTextValue = _keycodeDictionary2.default[e.keyCode];
 
-            input.value = keyTextValue;
+            input.value = e.key;
 
             // TODO handle control configuration before the party is initialized
-            initPlayerControls[player][controlName] = keyTextValue;
+            initPlayerControls[player][controlName] = e.key;
 
             if (party) {
-                var control = {};
-                control[controlName] = keyTextValue;
-                party.players[player].setControls(control);
+                party.players[player].setControlForKey(controlName, e.key);
             }
 
             return false;
@@ -1358,6 +1166,19 @@ var Party = function () {
         this.resetScore();
     };
 
+    Party.prototype.clear = function clear() {
+        // Clear players
+        _lodash2.default.each(this.players, function (player) {
+            return player.keyboard.destroy();
+        });
+
+        // Clear scene
+        this.clearScene();
+
+        // Reset score
+        this.resetScore();
+    };
+
     Party.prototype.clearScene = function clearScene() {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             var obj = this.scene.children[i];
@@ -1376,11 +1197,8 @@ var Party = function () {
     };
 
     Party.prototype.newGame = function newGame() {
-        // Clear scene
-        this.clearScene();
-
-        // Reset score
-        this.resetScore();
+        // Clear
+        this.clear();
 
         // Lightning
         // TODO Better lightning
@@ -1655,9 +1473,9 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _THREEx = require('./libs/THREEx.KeyboardState');
+var _keyboardState = require('./keyboardState');
 
-var _THREEx2 = _interopRequireDefault(_THREEx);
+var _keyboardState2 = _interopRequireDefault(_keyboardState);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1670,7 +1488,7 @@ var Player = function () {
         this.name = name;
         this.controls = controls;
         this.side = side;
-        this.keyboard = new _THREEx2.default();
+        this.keyboard = new _keyboardState2.default();
         this.blob = null;
         this.currentTouches = 0;
     }

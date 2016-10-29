@@ -31,6 +31,17 @@ export default class Party {
         this.resetScore();
     }
 
+    clear () {
+        // Clear players
+        _.each(this.players, (player) => player.keyboard.destroy());
+
+        // Clear scene
+        this.clearScene();
+
+        // Reset score
+        this.resetScore();
+    }
+
     clearScene () {
         for (let i = this.scene.children.length - 1; i >= 0; i --) {
             let obj = this.scene.children[i];
@@ -54,11 +65,8 @@ export default class Party {
     }
 
     newGame () {
-        // Clear scene
-        this.clearScene();
-
-        // Reset score
-        this.resetScore();
+        // Clear
+        this.clear();
 
         // Lightning
         // TODO Better lightning
