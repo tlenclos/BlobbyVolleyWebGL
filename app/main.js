@@ -6,7 +6,6 @@ import screenfull from 'screenfull';
 import ScreenManager from './screensManager';
 import Party from './party';
 import Rules from './rules';
-import keycodeDictionary from './keycodeDictionary';
 import AssetManager from './assetManager';
 
 const OrbitControls = require('three-orbit-controls')(THREE);
@@ -50,9 +49,9 @@ let camera, scene, renderer, stats, container,
             'left': 'q'
         },
         {
-            'up': 'up',
-            'right': 'right',
-            'left': 'left'
+            'up': 'ArrowUp',
+            'right': 'ArrowRight',
+            'left': 'ArrowLeft'
         }
     ],
     rules = new Rules(),
@@ -175,20 +174,22 @@ function initGame() {
     // Control menu is displayed, listen keyboard event on inputs
     screenManager.on("controlsMenu", function() {
         const keydownOnInputControl = function(e) {
+            // Allow keyboard navigation
+            if (_.includes(['Tab', 'Shift'], e.key)) {
+                return;
+            }
+
             const input = e.target;
             const player = parseInt(input.getAttribute('data-player'));
             const controlName = input.getAttribute('data-control');
-            const keyTextValue = keycodeDictionary[e.keyCode];
 
-            input.value = keyTextValue;
+            input.value = e.key;
 
             // TODO handle control configuration before the party is initialized
-            initPlayerControls[player][controlName] = keyTextValue;
+            initPlayerControls[player][controlName] = e.key;
 
             if (party) {
-                const control = {};
-                control[controlName] = keyTextValue;
-                party.players[player].setControls(control)
+                party.players[player].setControlForKey(controlName, e.key)
             }
 
             return false;

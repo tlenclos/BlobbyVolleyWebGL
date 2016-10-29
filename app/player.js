@@ -1,12 +1,12 @@
 import _ from 'lodash';
-import THREExKeyboardState from './libs/THREEx.KeyboardState';
+import KeyboardState from './keyboardState';
 
 export default class Player {
     constructor (name, controls, side) {
         this.name = name;
         this.controls = controls;
         this.side = side;
-        this.keyboard = new THREExKeyboardState();
+        this.keyboard = new KeyboardState();
         this.blob = null;
         this.currentTouches = 0;
     }

@@ -183,6 +183,10 @@ input.controlKey {
     margin-right: 50px;
 }
 
+input.controlKey:focus {
+    border: 2px solid #41ab6b;
+}
+
 /* Rules screen */
 #rulesMenu p {
     text-align: left;
