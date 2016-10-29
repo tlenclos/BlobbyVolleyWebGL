@@ -1642,7 +1642,7 @@ function newParty() {
 }
 
 function pauseGame() {
-    if (!party.inProgress) {
+    if (!party || !party.inProgress) {
         return;
     }
 
@@ -1756,10 +1756,10 @@ var Party = function () {
         this.ball = null;
         this.scores = null;
         this.paused = false;
-        this.lockPause = false;
         this.playingSide = null;
         this.servingSide = null;
         this.inProgress = null;
+        this.waitForUserInput = null;
 
         this.init();
     }
@@ -1851,6 +1851,7 @@ var Party = function () {
         }
 
         this.inProgress = true;
+        this.waitForUserInput = true;
     };
 
     Party.prototype.endGame = function endGame() {
@@ -1862,12 +1863,9 @@ var Party = function () {
     Party.prototype.afterScoring = function afterScoring(winSide) {
         this.playingSide = null;
         this.resetTouches();
+        this.waitForUserInput = true;
 
         var resetObjects = true;
-
-        // Internal pause
-        this.pause(true);
-        this.lockPause = true;
 
         if (winSide === this.servingSide) {
             this.incrementScore(winSide);
@@ -1894,19 +1892,10 @@ var Party = function () {
             _lodash2.default.forEach(this.players, function (player) {
                 player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
             });
-
-            _lodash2.default.delay(function () {
-                this.lockPause = false;
-                this.pause(false);
-            }.bind(this), 1000);
         }
     };
 
     Party.prototype.pause = function pause(_pause) {
-        if (this.lockPause) {
-            throw new Error('Pause is locked');
-        }
-
         this.paused = !_lodash2.default.isUndefined(_pause) ? Boolean(_pause) : !this.paused;
         return this.paused;
     };
@@ -1919,12 +1908,29 @@ var Party = function () {
         this.applyRules();
 
         for (var i in this.players) {
-            this.players[i].listenInput();
+            if (this.gotUserInput()) {
+                this.players[i].listenInput();
+            }
+
             this.players[i].getBlob().physics();
         }
 
         this.ball.physics();
+        this.physics.getWorld().applyGravity = this.gotUserInput();
         this.physics.step(fixedTimeStep, deltaTime, maxSubSteps);
+    };
+
+    Party.prototype.gotUserInput = function gotUserInput() {
+        if (!this.waitForUserInput) {
+            return true;
+        }
+
+        // Check if serving player has pressed a key
+        var player = _lodash2.default.find(this.players, { 'side': this.servingSide });
+
+        this.waitForUserInput = _lodash2.default.chain(_lodash2.default.values(player.controls)).map(player.keyboard.pressed.bind(player.keyboard)).filter().isEmpty().value();
+
+        return !this.waitForUserInput;
     };
 
     Party.prototype.applyRules = function applyRules() {

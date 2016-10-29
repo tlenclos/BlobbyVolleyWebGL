@@ -260,7 +260,7 @@ function newParty () {
 }
 
 function pauseGame () {
-    if (!party.inProgress) {
+    if (!party || !party.inProgress) {
         return;
     }
 
