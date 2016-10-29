@@ -19,10 +19,10 @@ export default class Party {
         this.ball = null;
         this.scores = null;
         this.paused = false;
-        this.lockPause = false;
         this.playingSide = null;
         this.servingSide = null;
         this.inProgress = null;
+        this.waitForUserInput = null;
 
         this.init();
     }
@@ -119,6 +119,7 @@ export default class Party {
         }
 
         this.inProgress = true;
+        this.waitForUserInput = true;
     }
 
     endGame () {
@@ -135,12 +136,9 @@ export default class Party {
     afterScoring (winSide) {
         this.playingSide = null;
         this.resetTouches();
+        this.waitForUserInput = true;
 
         let resetObjects = true;
-
-        // Internal pause
-        this.pause(true);
-        this.lockPause = true;
 
         if (winSide === this.servingSide) {
             this.incrementScore(winSide);
@@ -172,19 +170,10 @@ export default class Party {
             _.forEach(this.players, function (player) {
                 player.blob.moveTo([player.side === 'left' ? -5 : 5, -4]);
             });
-
-            _.delay(function () {
-                this.lockPause = false;
-                this.pause(false);
-            }.bind(this), 1000);
         }
     }
 
     pause (pause) {
-        if (this.lockPause) {
-            throw new Error('Pause is locked');
-        }
-
         this.paused = !_.isUndefined(pause) ? Boolean(pause) : !this.paused;
         return this.paused;
     }
@@ -197,12 +186,33 @@ export default class Party {
         this.applyRules();
 
         for (const i in this.players) {
-            this.players[i].listenInput();
+            if (this.gotUserInput()) {
+                this.players[i].listenInput();
+            }
+
             this.players[i].getBlob().physics();
         }
 
         this.ball.physics();
+        this.physics.getWorld().applyGravity = this.gotUserInput();
         this.physics.step(fixedTimeStep, deltaTime, maxSubSteps);
+    }
+
+    gotUserInput () {
+        if (!this.waitForUserInput) {
+            return true;
+        }
+
+        // Check if serving player has pressed a key
+        const player = _.find(this.players, { 'side': this.servingSide });
+
+        this.waitForUserInput = _.chain(_.values(player.controls))
+            .map(player.keyboard.pressed.bind(player.keyboard))
+            .filter()
+            .isEmpty()
+            .value();
+
+        return !this.waitForUserInput;
     }
 
     applyRules () {
