@@ -209,7 +209,7 @@ function initGame () {
 
     // Rules menu is displayed, listen keyboard event on inputs
     screenManager.on("rulesMenu", function () {
-        const keydownOnInputControl = function (e) {
+        const onChange = function (e) {
             const input = e.target;
             const ruleValue = parseInt(input.value);
             const ruleName = input.getAttribute('data-ruleName');
@@ -222,7 +222,7 @@ function initGame () {
             item.value = rules.config[ruleName];
 
             if (_.isNull(item.onkeyup)) {
-                item.onkeyup = keydownOnInputControl;
+                item.onchange = onChange;
             }
         });
     });
