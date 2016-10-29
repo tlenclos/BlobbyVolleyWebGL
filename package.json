@@ -30,7 +30,7 @@
   "scripts": {
     "lint-staged": "lint-staged",
     "start": "brunch watch --server",
-    "prod": "brunch build --production"
+    "prod": "rm -rf public/ && brunch build --production"
   },
   "lint-staged": {
     "*.js": "eslint"
