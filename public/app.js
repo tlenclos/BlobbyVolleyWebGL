@@ -620,22 +620,16 @@ var Field = function () {
     }
 
     Field.prototype.init = function init() {
-        var ground = void 0,
-            leftWall = void 0,
-            rightWall = void 0,
-            net = void 0,
-            bg = void 0;
+        var ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
 
-        ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
+        var leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
 
-        leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
+        var rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
 
-        rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
-
-        net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20, null, 0xDEDEDE, 0.8);
+        var net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20, null, 0xDEDEDE, 0.8);
 
         // Background
-        bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: window.assetManager.get('textures.background') }));
+        var bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: window.assetManager.get('textures.background') }));
 
         bg.position.z = -20;
         bg.position.y = 12;
@@ -808,13 +802,17 @@ var OrbitControls = require('three-orbit-controls')(_three2.default);
 var fixedTimeStep = 1 / 60;
 var maxSubSteps = 10;
 var lastTime = void 0;
+
 var camera = void 0,
     scene = void 0,
     renderer = void 0,
     stats = void 0,
     container = void 0,
     party = void 0,
-    screens = {
+    request = void 0,
+    initialized = false;
+
+var screens = {
     "loadingMenu": document.getElementById("loadingMenu"),
     "mainMenu": document.getElementById("mainMenu"),
     "pauseMenu": document.getElementById("pauseMenu"),
@@ -826,8 +824,6 @@ var camera = void 0,
 },
     screenManager = new _screensManager2.default(screens, document.getElementById("flashMessage"), document.getElementById("flashText")),
     assetManager = new _assetManager2.default(),
-    request = void 0,
-    initialized = false,
     scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
     scoreRightDisplay = document.getElementById("scoreRightDisplay"),
     serviceDisplay = document.getElementById("serviceDisplay"),
@@ -1024,7 +1020,7 @@ function newParty() {
     screenManager.hide();
     screenManager.displayFlashMessage("Game starts !");
 
-    updateRulesUI(rules);
+    updateRulesUI();
 
     // Party
     party = new _party2.default(scene, rules, [{
@@ -1042,7 +1038,9 @@ function newParty() {
 }
 
 function pauseGame() {
-    if (!party.inProgress) return;
+    if (!party.inProgress) {
+        return;
+    }
 
     var pauseState = party.pause();
 
@@ -1053,7 +1051,7 @@ function pauseGame() {
     }
 }
 
-function updateRulesUI(rules) {
+function updateRulesUI() {
     scoreNeededToWinDisplay.textContent = rules.config.scoreToWin;
     maximumContactsAllowedDisplay.textContent = rules.config.maximumContactsAllowed;
 }
@@ -1216,18 +1214,13 @@ var Party = function () {
 
         for (var index in this.playersConfig) {
             var playerConfig = this.playersConfig[index];
-            var blob = void 0,
-                position = void 0,
-                color = void 0,
-                player = void 0;
+            var position = [playerConfig.position === 'left' ? -5 : 5, -4];
+            var color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
 
-            position = [playerConfig.position === 'left' ? -5 : 5, -4];
-            color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
+            var blob = new _blob2.default(this.physics.getWorld(), color, position);
+            var player = new _player2.default(playerConfig.name, playerConfig.controls, playerConfig.position);
 
-            blob = new _blob2.default(this.physics.getWorld(), color, position);
-            player = new _player2.default(playerConfig.name, playerConfig.controls, playerConfig.position);
             player.attachBlob(blob);
-
             this.players.push(player);
         }
 
@@ -1305,7 +1298,7 @@ var Party = function () {
 
     Party.prototype.pause = function pause(_pause) {
         if (this.lockPause) {
-            throw 'Pause is locked';
+            throw new Error('Pause is locked');
         }
 
         this.paused = !_lodash2.default.isUndefined(_pause) ? Boolean(_pause) : !this.paused;
@@ -1501,7 +1494,7 @@ var Player = function () {
 
     Player.prototype.setControlForKey = function setControlForKey(key, keyBinding) {
         if (_lodash2.default.isUndefined(this.controls[key])) {
-            throw "This control does not exist";
+            throw new Error("This control does not exist");
         }
 
         this.controls[key] = keyBinding;
@@ -1627,16 +1620,16 @@ var ScreenManager = function (_EventEmitter) {
 
         _lodash2.default.forEach(screens, function (item) {
             if (!(item instanceof HTMLElement)) {
-                throw "Screen must be an instance of HTMLElement";
+                throw new Error("Screen must be an instance of HTMLElement");
             }
         });
 
         if (!(flashMessageElement instanceof HTMLElement)) {
-            throw "flashMessageElement must be an instance of HTMLElement";
+            throw new Error("flashMessageElement must be an instance of HTMLElement");
         }
 
         if (!(flashMessageTextElement instanceof HTMLElement)) {
-            throw "flashMessageTextElement must be an instance of HTMLElement";
+            throw new Error("flashMessageTextElement must be an instance of HTMLElement");
         }
 
         _this.screens = screens;
@@ -1667,7 +1660,7 @@ var ScreenManager = function (_EventEmitter) {
 
     ScreenManager.prototype.getScreen = function getScreen(name) {
         if (_lodash2.default.isUndefined(this.screens[name])) {
-            throw 'Screen ' + name + ' does not exist';
+            throw new Error('Screen ' + name + ' does not exist');
         }
 
         return this.screens[name];

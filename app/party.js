@@ -43,8 +43,8 @@ export default class Party {
     }
 
     clearScene () {
-        for (let i = this.scene.children.length - 1; i >= 0; i --) {
-            let obj = this.scene.children[i];
+        for (let i = this.scene.children.length - 1; i >= 0; i--) {
+            const obj = this.scene.children[i];
             this.scene.remove(obj);
         }
     }
@@ -82,21 +82,15 @@ export default class Party {
         // Players
         this.players = [];
 
-        for (let index in this.playersConfig) {
+        for (const index in this.playersConfig) {
             const playerConfig = this.playersConfig[index];
-            let blob,
-                position,
-                color,
-                player
-            ;
+            const position = [playerConfig.position === 'left' ? -5 : 5, -4];
+            const color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
 
-            position = [playerConfig.position === 'left' ? -5 : 5, -4];
-            color = playerConfig.position === 'left' ? 0xff0000 : 0x0000ff;
+            const blob = new Blob(this.physics.getWorld(), color, position);
+            const player = new Player(playerConfig.name, playerConfig.controls, playerConfig.position);
 
-            blob = new Blob(this.physics.getWorld(), color, position);
-            player = new Player(playerConfig.name, playerConfig.controls, playerConfig.position);
             player.attachBlob(blob);
-
             this.players.push(player);
         }
 
@@ -116,7 +110,7 @@ export default class Party {
             this.ball.threeObject
         ];
 
-        for (let i in meshes) {
+        for (const i in meshes) {
             this.scene.add(meshes[i]);
         }
 
@@ -133,7 +127,7 @@ export default class Party {
         window.dispatchEvent(
             new CustomEvent(
                 'endGame',
-                {detail: {message: _.invert(this.scores)[_.max(_.values(this.scores))] + ' player wins'}}
+                {detail: {message: `${_.invert(this.scores)[_.max(_.values(this.scores))]} player wins`}}
             )
         );
     }
@@ -151,8 +145,7 @@ export default class Party {
 
             // End of game
             const maxScore = _.max(_.values(this.scores)),
-                minScore = _.min(_.values(this.scores))
-            ;
+                minScore = _.min(_.values(this.scores));
 
             if (maxScore >= this.rules.config.scoreToWin && maxScore - minScore > 1) {
                 this.endGame();
@@ -187,7 +180,7 @@ export default class Party {
 
     pause (pause) {
         if (this.lockPause) {
-            throw 'Pause is locked';
+            throw new Error('Pause is locked');
         }
 
         this.paused = !_.isUndefined(pause) ? Boolean(pause) : !this.paused;
@@ -201,7 +194,7 @@ export default class Party {
 
         this.applyRules();
 
-        for (let i in this.players) {
+        for (const i in this.players) {
             this.players[i].listenInput();
             this.players[i].getBlob().physics();
         }
@@ -212,8 +205,7 @@ export default class Party {
 
     applyRules () {
         let winSide = null,
-            resetTouches = false
-        ;
+            resetTouches = false;
 
         // Ball touching ground
         if (this.ball.isTouchingGround()) {

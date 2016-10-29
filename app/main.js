@@ -14,9 +14,13 @@ const OrbitControls = require('three-orbit-controls')(THREE);
 const fixedTimeStep = 1 / 60;
 const maxSubSteps = 10;
 let lastTime;
+
 let camera, scene, renderer, stats, container,
     party,
-    screens = {
+    request,
+    initialized = false;
+
+const screens = {
         "loadingMenu": document.getElementById("loadingMenu"),
         "mainMenu": document.getElementById("mainMenu"),
         "pauseMenu": document.getElementById("pauseMenu"),
@@ -32,8 +36,6 @@ let camera, scene, renderer, stats, container,
         document.getElementById("flashText")
     ),
     assetManager = new AssetManager(),
-    request,
-    initialized = false,
     scoreLeftDisplay = document.getElementById("scoreLeftDisplay"),
     scoreRightDisplay = document.getElementById("scoreRightDisplay"),
     serviceDisplay = document.getElementById("serviceDisplay"),
@@ -55,14 +57,13 @@ let camera, scene, renderer, stats, container,
         }
     ],
     rules = new Rules(),
-    debug = false
-    ;
+    debug = false;
 
 // Bootstrap
 init();
 
 // Init
-function init() {
+function init () {
     if (initialized) {
         return;
     }
@@ -88,7 +89,7 @@ function loadGame () {
 }
 
 // Init game
-function initGame() {
+function initGame () {
     // Scene
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -134,7 +135,7 @@ function initGame() {
     });
 
     // End game event listener
-    window.addEventListener("endGame", function(e) {
+    window.addEventListener("endGame", function (e) {
         screenManager.displayFlashMessage(e.detail.message);
         pauseGame();
 
@@ -145,7 +146,7 @@ function initGame() {
     window.addEventListener("score", updateScoreUI);
 
     // Video menu is displayed, listen keyboard event on inputs
-    screenManager.on("videoMenu", function() {
+    screenManager.on("videoMenu", function () {
         const onChange = function (e) {
             const input = e.target;
             const value = input.value;
@@ -172,8 +173,8 @@ function initGame() {
     });
 
     // Control menu is displayed, listen keyboard event on inputs
-    screenManager.on("controlsMenu", function() {
-        const keydownOnInputControl = function(e) {
+    screenManager.on("controlsMenu", function () {
+        const keydownOnInputControl = function (e) {
             // Allow keyboard navigation
             if (_.includes(['Tab', 'Shift'], e.key)) {
                 return;
@@ -189,13 +190,13 @@ function initGame() {
             initPlayerControls[player][controlName] = e.key;
 
             if (party) {
-                party.players[player].setControlForKey(controlName, e.key)
+                party.players[player].setControlForKey(controlName, e.key);
             }
 
             return false;
         };
 
-        _.forEach(controlsElements, function(item) {
+        _.forEach(controlsElements, function (item) {
             const player = parseInt(item.getAttribute('data-player'));
             const controlName = item.getAttribute('data-control');
             item.value = initPlayerControls[player][controlName];
@@ -207,8 +208,8 @@ function initGame() {
     });
 
     // Rules menu is displayed, listen keyboard event on inputs
-    screenManager.on("rulesMenu", function() {
-        const keydownOnInputControl = function(e) {
+    screenManager.on("rulesMenu", function () {
+        const keydownOnInputControl = function (e) {
             const input = e.target;
             const ruleValue = parseInt(input.value);
             const ruleName = input.getAttribute('data-ruleName');
@@ -216,7 +217,7 @@ function initGame() {
             input.value = ruleValue;
         };
 
-        _.forEach(rulesElements, function(item) {
+        _.forEach(rulesElements, function (item) {
             const ruleName = item.getAttribute('data-ruleName');
             item.value = rules.config[ruleName];
 
@@ -230,11 +231,11 @@ function initGame() {
     screenManager.goTo("mainMenu");
 }
 
-function newParty() {
+function newParty () {
     screenManager.hide();
     screenManager.displayFlashMessage("Game starts !");
 
-    updateRulesUI(rules);
+    updateRulesUI();
 
     // Party
     party = new Party(
@@ -258,9 +259,10 @@ function newParty() {
     render();
 }
 
-function pauseGame() {
-    if (!party.inProgress)
+function pauseGame () {
+    if (!party.inProgress) {
         return;
+    }
 
     const pauseState = party.pause();
 
@@ -271,15 +273,14 @@ function pauseGame() {
     }
 }
 
-function updateRulesUI(rules) {
+function updateRulesUI () {
     scoreNeededToWinDisplay.textContent = rules.config.scoreToWin;
     maximumContactsAllowedDisplay.textContent = rules.config.maximumContactsAllowed;
 }
 
-function updateScoreUI(event) {
+function updateScoreUI (event) {
     const winSide = event.detail.side,
-        scores = event.detail.scores
-        ;
+        scores = event.detail.scores;
 
     scoreLeftDisplay.textContent = scores.left;
     scoreRightDisplay.textContent = scores.right;
@@ -288,11 +289,11 @@ function updateScoreUI(event) {
 }
 
 // Animation loop
-function renderLoop(time) {
+function renderLoop (time) {
     request = requestAnimationFrame(renderLoop);
 
     // Sync physics with time (compute elapsed time since last render frame)
-    var deltaTime = lastTime ? (time - lastTime) / 1000 : 0;
+    const deltaTime = lastTime ? (time - lastTime) / 1000 : 0;
 
     party.update(fixedTimeStep, deltaTime, maxSubSteps);
 
@@ -303,7 +304,7 @@ function renderLoop(time) {
 }
 
 // Launch animation
-function render() {
+function render () {
     if (!_.isUndefined(request)) {
         cancelAnimationFrame(request);
     }

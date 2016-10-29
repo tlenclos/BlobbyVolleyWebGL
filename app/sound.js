@@ -20,7 +20,7 @@ export default class Sound {
     }
 
     getAudio () {
-       return this.audio;
+        return this.audio;
     }
 
     _play (restart) {
