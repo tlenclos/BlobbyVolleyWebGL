@@ -8,7 +8,7 @@ import Party from './party';
 import Rules from './rules';
 import AssetManager from './assetManager';
 
-const OrbitControls = require('three-orbit-controls')(THREE);
+const OrbitControls = require('./libs/ThreeOrbitControls')(THREE);
 
 // Variables
 const fixedTimeStep = 1 / 60;
