@@ -1598,7 +1598,7 @@ function initGame() {
 
     // Rules menu is displayed, listen keyboard event on inputs
     screenManager.on("rulesMenu", function () {
-        var keydownOnInputControl = function keydownOnInputControl(e) {
+        var onChange = function onChange(e) {
             var input = e.target;
             var ruleValue = parseInt(input.value);
             var ruleName = input.getAttribute('data-ruleName');
@@ -1611,7 +1611,7 @@ function initGame() {
             item.value = rules.config[ruleName];
 
             if (_lodash2.default.isNull(item.onkeyup)) {
-                item.onkeyup = keydownOnInputControl;
+                item.onchange = onChange;
             }
         });
     });
