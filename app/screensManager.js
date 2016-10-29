@@ -7,16 +7,16 @@ export default class ScreenManager extends EventEmitter {
 
         _.forEach(screens, function (item) {
             if (!(item instanceof HTMLElement)) {
-                throw "Screen must be an instance of HTMLElement";
+                throw new Error("Screen must be an instance of HTMLElement");
             }
         });
 
         if (!(flashMessageElement instanceof HTMLElement)) {
-            throw "flashMessageElement must be an instance of HTMLElement";
+            throw new Error("flashMessageElement must be an instance of HTMLElement");
         }
 
         if (!(flashMessageTextElement instanceof HTMLElement)) {
-            throw "flashMessageTextElement must be an instance of HTMLElement";
+            throw new Error("flashMessageTextElement must be an instance of HTMLElement");
         }
 
         this.screens = screens;
@@ -33,7 +33,7 @@ export default class ScreenManager extends EventEmitter {
     }
 
     goBack () {
-        const index = this.history.length-2;
+        const index = this.history.length - 2;
 
         if (index >= 0) {
             const previousScreen = this.history[index];
@@ -46,7 +46,7 @@ export default class ScreenManager extends EventEmitter {
 
     getScreen (name) {
         if (_.isUndefined(this.screens[name])) {
-            throw `Screen ${name} does not exist`;
+            throw new Error(`Screen ${name} does not exist`);
         }
 
         return this.screens[name];
@@ -71,7 +71,7 @@ export default class ScreenManager extends EventEmitter {
         this.fadeIn(this.flashMessageElement);
 
         setTimeout(function () {
-            this.fadeOut(this.flashMessageElement)
+            this.fadeOut(this.flashMessageElement);
         }.bind(this), duration ? duration : 2000);
     }
 
@@ -81,11 +81,11 @@ export default class ScreenManager extends EventEmitter {
 
         let last = +new Date();
         const tick = function () {
-            el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
+            el.style.opacity = +el.style.opacity + ((new Date() - last) / 400);
             last = +new Date();
 
             if (+el.style.opacity < 1) {
-                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16)
+                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
             }
         };
 
@@ -102,7 +102,7 @@ export default class ScreenManager extends EventEmitter {
             last = +new Date();
 
             if (+el.style.opacity > 0) {
-                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16)
+                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
             }
         };
 

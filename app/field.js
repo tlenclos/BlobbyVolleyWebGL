@@ -18,9 +18,7 @@ export default class Field {
     }
 
     init () {
-        let ground, leftWall, rightWall, net, bg;
-
-        ground = this.createWall(
+        const ground = this.createWall(
             this.x,
             this.y - (this.height / 2) - 0.5,
             this.width,
@@ -32,7 +30,7 @@ export default class Field {
             'type_ground'
         );
 
-        leftWall = this.createWall(
+        const leftWall = this.createWall(
             this.x - (this.width / 2) - 0.5,
             this.y + (this.height / 2),
             1,
@@ -43,7 +41,7 @@ export default class Field {
             0
         );
 
-        rightWall = this.createWall(
+        const rightWall = this.createWall(
             this.x + (this.width / 2) + 0.5,
             this.y + (this.height / 2),
             1,
@@ -54,7 +52,7 @@ export default class Field {
             0
         );
 
-        net = this.createWall(
+        const net = this.createWall(
             this.x,
             this.y - (this.height / 2) + (this.height / 4),
             0.3,
@@ -66,7 +64,7 @@ export default class Field {
         );
 
         // Background
-        bg = new THREE.Mesh(
+        const bg = new THREE.Mesh(
             new THREE.PlaneGeometry(110, 90, 0),
             new THREE.MeshBasicMaterial({map: window.assetManager.get('textures.background')})
         );
@@ -104,8 +102,7 @@ export default class Field {
 
         const geometry = width > height
                 ? new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0)
-                : new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0)
-            ;
+                : new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0);
 
         let material;
 

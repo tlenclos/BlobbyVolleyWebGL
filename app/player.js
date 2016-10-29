@@ -12,14 +12,14 @@ export default class Player {
     }
 
     setControls (controls) {
-        _.forEach(controls, function(value, key) {
+        _.forEach(controls, function (value, key) {
             this.setControlForKey(key, value);
         }.bind(this));
     }
 
     setControlForKey (key, keyBinding) {
         if (_.isUndefined(this.controls[key])) {
-            throw "This control does not exist";
+            throw new Error("This control does not exist");
         }
 
         this.controls[key] = keyBinding;
@@ -38,10 +38,9 @@ export default class Player {
         let x = 0,
             y = 0;
 
-        for (let key in this.controls) {
+        for (const key in this.controls) {
             const control = this.controls[key],
-                antagonistControl = this.controls[this.getControlsAntagonistKey(key)]
-            ;
+                antagonistControl = this.controls[this.getControlsAntagonistKey(key)];
 
             if (
                 this.keyboard.pressed(control)
