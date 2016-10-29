@@ -134,6 +134,8 @@ export default class Party {
 
     afterScoring (winSide) {
         this.playingSide = null;
+        this.resetTouches();
+
         let resetObjects = true;
 
         // Internal pause
@@ -204,8 +206,7 @@ export default class Party {
     }
 
     applyRules () {
-        let winSide = null,
-            resetTouches = false;
+        let winSide = null;
 
         // Ball touching ground
         if (this.ball.isTouchingGround()) {
@@ -215,37 +216,35 @@ export default class Party {
         } else {
             _.forEach(this.players, function (player) {
                 if (player.getBlob().isTouchingBall()) {
-                    player.currentTouches++;
-
                     if (player.side !== this.playingSide) {
                         // Switching side, reset touches
                         if (!_.isNull(this.playingSide)) {
-                            resetTouches = true;
+                            this.resetTouches();
                         }
 
                         this.playingSide = player.side;
                     }
+
+                    player.currentTouches++;
                 }
 
                 // Maximum touches reached
                 if (player.currentTouches > this.rules.config.maximumContactsAllowed) {
                     winSide = player.side === 'right' ? 'left' : 'right';
-                    resetTouches = true;
                 }
             }.bind(this));
-        }
-
-        // Reset touches count
-        if (resetTouches) {
-            _.forEach(this.players, function (player) {
-                player.currentTouches = 0;
-            });
         }
 
         // We have a winner for this round
         if (winSide) {
             this.afterScoring(winSide);
         }
+    }
+
+    resetTouches () {
+        _.forEach(this.players, function (player) {
+            player.currentTouches = 0;
+        });
     }
 
     incrementScore (side) {
