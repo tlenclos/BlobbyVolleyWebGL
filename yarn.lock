@@ -3284,10 +3284,6 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
-three-orbit-controls@^72.0.0:
-  version "72.0.0"
-  resolved "https://registry.yarnpkg.com/three-orbit-controls/-/three-orbit-controls-72.0.0.tgz#13a4cbf3780cc6e5446aed0032fe1c5135e72755"
-
 three-window-resize@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/three-window-resize/-/three-window-resize-1.0.4.tgz#d636a65d22f587c87c3d3b6129d9b5d20b0d7d09"

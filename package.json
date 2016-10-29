@@ -13,7 +13,6 @@
     "screenfull": "^3.0.2",
     "stats.js": "^0.16.0",
     "three": "0.66.97",
-    "three-orbit-controls": "^72.0.0",
     "three-window-resize": "^1.0.4"
   },
   "devDependencies": {
