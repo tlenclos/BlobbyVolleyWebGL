@@ -1861,6 +1861,8 @@ var Party = function () {
 
     Party.prototype.afterScoring = function afterScoring(winSide) {
         this.playingSide = null;
+        this.resetTouches();
+
         var resetObjects = true;
 
         // Internal pause
@@ -1926,8 +1928,7 @@ var Party = function () {
     };
 
     Party.prototype.applyRules = function applyRules() {
-        var winSide = null,
-            resetTouches = false;
+        var winSide = null;
 
         // Ball touching ground
         if (this.ball.isTouchingGround()) {
@@ -1937,37 +1938,35 @@ var Party = function () {
         } else {
             _lodash2.default.forEach(this.players, function (player) {
                 if (player.getBlob().isTouchingBall()) {
-                    player.currentTouches++;
-
                     if (player.side !== this.playingSide) {
                         // Switching side, reset touches
                         if (!_lodash2.default.isNull(this.playingSide)) {
-                            resetTouches = true;
+                            this.resetTouches();
                         }
 
                         this.playingSide = player.side;
                     }
+
+                    player.currentTouches++;
                 }
 
                 // Maximum touches reached
                 if (player.currentTouches > this.rules.config.maximumContactsAllowed) {
                     winSide = player.side === 'right' ? 'left' : 'right';
-                    resetTouches = true;
                 }
             }.bind(this));
-        }
-
-        // Reset touches count
-        if (resetTouches) {
-            _lodash2.default.forEach(this.players, function (player) {
-                player.currentTouches = 0;
-            });
         }
 
         // We have a winner for this round
         if (winSide) {
             this.afterScoring(winSide);
         }
+    };
+
+    Party.prototype.resetTouches = function resetTouches() {
+        _lodash2.default.forEach(this.players, function (player) {
+            player.currentTouches = 0;
+        });
     };
 
     Party.prototype.incrementScore = function incrementScore(side) {
