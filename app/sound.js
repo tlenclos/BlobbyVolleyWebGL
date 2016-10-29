@@ -1,37 +1,33 @@
+import { Howl } from 'howler';
 import _ from 'lodash';
 
 export default class Sound {
-    constructor (sources) {
+    constructor (sources, options) {
         this.sources = sources;
-        this.audio = null;
+        this.audio = new Howl(
+            _.assign(
+                {
+                    src: sources
+                },
+                options
+            )
+        );
         this.play = _.throttle(this._play.bind(this), 100, { leading: true });
-
-        this.init();
-    }
-
-    init () {
-        this.audio = document.createElement('audio');
-
-        for (let i = 0; i < this.sources.length; i++) {
-            const source = document.createElement('source');
-            source.src = this.sources[i];
-            this.audio.appendChild(source);
-        }
     }
 
     getAudio () {
         return this.audio;
     }
 
-    _play (restart) {
-        if (restart === true && this.audio.currentTime > 0) {
-            this.stop();
-        }
-
-        this.audio.play();
+    _play (id) {
+        this.audio.play(id);
     }
 
-    stop () {
-        this.audio.currentTime = 0;
+    pause (id) {
+        this.audio.pause(id);
+    }
+
+    stop (id) {
+        this.audio.stop(id);
     }
 }

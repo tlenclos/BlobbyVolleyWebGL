@@ -7,6 +7,7 @@ import Blob from './blob';
 import Field from './field';
 import Player from './player';
 import Physics from './physics';
+import Sound from './sound';
 
 export default class Party {
     constructor (scene, rules, playersConfig) {
@@ -23,12 +24,18 @@ export default class Party {
         this.servingSide = null;
         this.inProgress = null;
         this.waitForUserInput = null;
+        this.whistleSound = null;
+        this.scoringSound = null;
+        this.winSound = null;
 
         this.init();
     }
 
     init () {
         this.resetScore();
+        this.whistleSound = new Sound(['sounds/whistle.mp3', 'sounds/whistle.ogg']);
+        this.scoringSound = new Sound(['sounds/scoring.mp3', 'sounds/scoring.ogg']);
+        this.winSound = new Sound(['sounds/win.mp3', 'sounds/win.ogg']);
     }
 
     clear () {
@@ -120,6 +127,7 @@ export default class Party {
 
         this.inProgress = true;
         this.waitForUserInput = true;
+        this.whistleSound.play();
     }
 
     endGame () {
@@ -131,9 +139,13 @@ export default class Party {
                 {detail: {message: `${_.invert(this.scores)[_.max(_.values(this.scores))]} player wins`}}
             )
         );
+
+        this.scoringSound.stop();
+        this.winSound.play();
     }
 
     afterScoring (winSide) {
+        this.scoringSound.play();
         this.playingSide = null;
         this.resetTouches();
         this.waitForUserInput = true;
