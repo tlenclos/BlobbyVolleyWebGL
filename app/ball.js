@@ -104,7 +104,7 @@ export default class Ball {
         this.threeObject.position.y = pos[1];
 
         if (this.hasTouchingContact()) {
-            this.sound.play(true);
+            this.sound.play();
         }
     }
 

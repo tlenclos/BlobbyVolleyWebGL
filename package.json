@@ -8,6 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "howler": "^2.0.1",
     "lodash": "^4.16.4",
     "p2": "^0.7.1",
     "screenfull": "^3.0.2",

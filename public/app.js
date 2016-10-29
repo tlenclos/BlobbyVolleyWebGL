@@ -360,7 +360,7 @@ var Ball = function () {
         this.threeObject.position.y = pos[1];
 
         if (this.hasTouchingContact()) {
-            this.sound.play(true);
+            this.sound.play();
         }
     };
 
@@ -1739,6 +1739,10 @@ var _physics = require('./physics');
 
 var _physics2 = _interopRequireDefault(_physics);
 
+var _sound = require('./sound');
+
+var _sound2 = _interopRequireDefault(_sound);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1760,12 +1764,18 @@ var Party = function () {
         this.servingSide = null;
         this.inProgress = null;
         this.waitForUserInput = null;
+        this.whistleSound = null;
+        this.scoringSound = null;
+        this.winSound = null;
 
         this.init();
     }
 
     Party.prototype.init = function init() {
         this.resetScore();
+        this.whistleSound = new _sound2.default(['sounds/whistle.mp3', 'sounds/whistle.ogg']);
+        this.scoringSound = new _sound2.default(['sounds/scoring.mp3', 'sounds/scoring.ogg']);
+        this.winSound = new _sound2.default(['sounds/win.mp3', 'sounds/win.ogg']);
     };
 
     Party.prototype.clear = function clear() {
@@ -1852,15 +1862,20 @@ var Party = function () {
 
         this.inProgress = true;
         this.waitForUserInput = true;
+        this.whistleSound.play();
     };
 
     Party.prototype.endGame = function endGame() {
         this.inProgress = false;
 
         window.dispatchEvent(new CustomEvent('endGame', { detail: { message: _lodash2.default.invert(this.scores)[_lodash2.default.max(_lodash2.default.values(this.scores))] + ' player wins' } }));
+
+        this.scoringSound.stop();
+        this.winSound.play();
     };
 
     Party.prototype.afterScoring = function afterScoring(winSide) {
+        this.scoringSound.play();
         this.playingSide = null;
         this.resetTouches();
         this.waitForUserInput = true;
@@ -2345,6 +2360,8 @@ require.register("sound.js", function(exports, require, module) {
 
 exports.__esModule = true;
 
+var _howler = require('howler');
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -2354,40 +2371,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Sound = function () {
-    function Sound(sources) {
+    function Sound(sources, options) {
         _classCallCheck(this, Sound);
 
         this.sources = sources;
-        this.audio = null;
+        this.audio = new _howler.Howl(_lodash2.default.assign({
+            src: sources
+        }, options));
         this.play = _lodash2.default.throttle(this._play.bind(this), 100, { leading: true });
-
-        this.init();
     }
-
-    Sound.prototype.init = function init() {
-        this.audio = document.createElement('audio');
-
-        for (var i = 0; i < this.sources.length; i++) {
-            var source = document.createElement('source');
-            source.src = this.sources[i];
-            this.audio.appendChild(source);
-        }
-    };
 
     Sound.prototype.getAudio = function getAudio() {
         return this.audio;
     };
 
-    Sound.prototype._play = function _play(restart) {
-        if (restart === true && this.audio.currentTime > 0) {
-            this.stop();
-        }
-
-        this.audio.play();
+    Sound.prototype._play = function _play(id) {
+        this.audio.play(id);
     };
 
-    Sound.prototype.stop = function stop() {
-        this.audio.currentTime = 0;
+    Sound.prototype.pause = function pause(id) {
+        this.audio.pause(id);
+    };
+
+    Sound.prototype.stop = function stop(id) {
+        this.audio.stop(id);
     };
 
     return Sound;

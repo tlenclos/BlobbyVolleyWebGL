@@ -1787,6 +1787,10 @@ hosted-git-info@~2.1.4:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.1.5.tgz#0ba81d90da2e25ab34a332e6ec77936e1598118b"
 
+howler:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/howler/-/howler-2.0.1.tgz#9c0f431395a54b2cd447636129dee158eddc683f"
+
 http-errors@~1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.5.0.tgz#b1cb3d8260fd8e2386cad3189045943372d48211"
