@@ -28,7 +28,8 @@ const screens = {
         "optionsMenu": document.getElementById("optionsMenu"),
         "videoMenu": document.getElementById("videoMenu"),
         "controlsMenu": document.getElementById("controlsMenu"),
-        "rulesMenu": document.getElementById("rulesMenu")
+        "rulesMenu": document.getElementById("rulesMenu"),
+        "mapsMenu": document.getElementById("mapsMenu")
     },
     screenManager = new ScreenManager(
         screens,
@@ -44,6 +45,10 @@ const screens = {
     videoParameterElements = screens['videoMenu'].querySelectorAll('.videoParameterElement'),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
     rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
+    mapElements = screens['mapsMenu'].querySelectorAll('.mapElement'),
+    config = {
+        fieldDecorator: 'beach'
+    },
     initPlayerControls = [
         {
             'up': 'z',
@@ -221,7 +226,22 @@ function initGame () {
             const ruleName = item.getAttribute('data-ruleName');
             item.value = rules.config[ruleName];
 
-            if (_.isNull(item.onkeyup)) {
+            if (_.isNull(item.onchange)) {
+                item.onchange = onChange;
+            }
+        });
+    });
+
+    // Maps menu is displayed, listen keyboard event on inputs
+    screenManager.on("mapsMenu", function () {
+        const onChange = function (e) {
+            config.fieldDecorator = e.target.value;
+        };
+
+        _.forEach(mapElements, function (item) {
+            item.value = config.fieldDecorator;
+
+            if (_.isNull(item.onchange)) {
                 item.onchange = onChange;
             }
         });
@@ -233,13 +253,14 @@ function initGame () {
 
 function newParty () {
     screenManager.hide();
-    screenManager.displayFlashMessage("Game starts !");
+    screenManager.displayFlashMessage("Game starts!");
 
     updateRulesUI();
 
     // Party
     party = new Party(
         scene,
+        config,
         rules,
         [
             {
