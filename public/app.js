@@ -615,29 +615,25 @@ var Field = function () {
         this.dims = [width, height];
         this.parts = [];
         this.materials = [];
+        this.fieldDecorator = null;
 
         this.init();
     }
 
     Field.prototype.init = function init() {
-        var ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, window.assetManager.get('textures.wood'), 0xEEEEEE, null, 'type_ground');
+        // Base field (ground, walls, net)
+        var ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, 'type_ground');
 
-        var leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
+        var leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 5, 20);
 
-        var rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 2, 20, null, 0xDEDEDE, 0);
+        var rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 5, 20);
 
-        var net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20, null, 0xDEDEDE, 0.8);
+        var net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20);
 
-        // Background
-        var bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({ map: window.assetManager.get('textures.background') }));
-
-        bg.position.z = -20;
-        bg.position.y = 12;
-
-        this.parts.push(ground, leftWall, rightWall, net, bg);
+        this.parts.push(ground, leftWall, rightWall, net);
     };
 
-    Field.prototype.createWall = function createWall(x, y, width, height, depth, texture, color, opacity, userData) {
+    Field.prototype.createWall = function createWall(x, y, width, height, depth, userData) {
         var body = new _p2.default.Body({
             mass: 0,
             position: [x, y]
@@ -662,28 +658,22 @@ var Field = function () {
 
         this.world.addBody(body);
 
-        var geometry = width > height ? new _three2.default.BoxGeometry(width, height, _lodash2.default.isNumber(depth) ? depth : 0) : new _three2.default.BoxGeometry(width, height, _lodash2.default.isNumber(depth) ? depth : 0);
+        var geometry = new _three2.default.BoxGeometry(width, height, _lodash2.default.isNumber(depth) ? depth : 0);
 
-        var material = void 0;
-
-        if (texture instanceof _three2.default.Texture) {
-            material = new _three2.default.MeshBasicMaterial({
-                map: texture,
-                transparent: true
-            });
-        } else {
-            material = new _three2.default.MeshBasicMaterial({
-                color: !_lodash2.default.isUndefined(color) ? color : 0x000000,
-                opacity: !_lodash2.default.isUndefined(opacity) ? opacity : 1,
-                transparent: true
-            });
-        }
+        var material = new _three2.default.MeshBasicMaterial({
+            opacity: 0,
+            transparent: true
+        });
 
         var mesh = new _three2.default.Mesh(geometry, material);
         mesh.position.x = body.position[0];
         mesh.position.y = body.position[1];
 
         return mesh;
+    };
+
+    Field.prototype.setDecorator = function setDecorator(fieldDecorator) {
+        this.fieldDecorator = fieldDecorator;
     };
 
     Field.prototype.getWorld = function getWorld() {
@@ -699,13 +689,223 @@ var Field = function () {
     };
 
     Field.prototype.getParts = function getParts() {
-        return this.parts;
+        var decoratorParts = this.fieldDecorator ? this.fieldDecorator.getParts() : [];
+
+        return [].concat(this.parts, decoratorParts);
     };
 
     return Field;
 }();
 
 exports.default = Field;
+module.exports = exports['default'];
+
+});
+
+require.register("fieldDecoratorFactory.js", function(exports, require, module) {
+'use strict';
+
+exports.__esModule = true;
+
+var _beachFieldDecorator = require('./fieldDecorators/beachFieldDecorator');
+
+var _beachFieldDecorator2 = _interopRequireDefault(_beachFieldDecorator);
+
+var _roomFieldDecorator = require('./fieldDecorators/roomFieldDecorator');
+
+var _roomFieldDecorator2 = _interopRequireDefault(_roomFieldDecorator);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var decorators = {
+    beach: _beachFieldDecorator2.default,
+    room: _roomFieldDecorator2.default
+};
+
+var FieldDecoratorFactory = function () {
+    function FieldDecoratorFactory() {
+        _classCallCheck(this, FieldDecoratorFactory);
+    }
+
+    FieldDecoratorFactory.factory = function factory(name, field) {
+        if (!_lodash2.default.has(decorators, name)) {
+            throw new Error('Decorator "' + name + '" does not exist');
+        }
+
+        return new decorators[name](field);
+    };
+
+    return FieldDecoratorFactory;
+}();
+
+exports.default = FieldDecoratorFactory;
+module.exports = exports['default'];
+
+});
+
+require.register("fieldDecorators/abstract.js", function(exports, require, module) {
+"use strict";
+
+exports.__esModule = true;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Abstract = function () {
+    function Abstract(field) {
+        _classCallCheck(this, Abstract);
+
+        this.field = field;
+        this.parts = [];
+        this.initialize();
+    }
+
+    Abstract.prototype.getParts = function getParts() {
+        return this.parts;
+    };
+
+    return Abstract;
+}();
+
+exports.default = Abstract;
+module.exports = exports["default"];
+
+});
+
+require.register("fieldDecorators/beachFieldDecorator.js", function(exports, require, module) {
+'use strict';
+
+exports.__esModule = true;
+
+var _abstract = require('./abstract');
+
+var _abstract2 = _interopRequireDefault(_abstract);
+
+var _three = require('three');
+
+var _three2 = _interopRequireDefault(_three);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BeachFieldDecorator = function (_Abstract) {
+    _inherits(BeachFieldDecorator, _Abstract);
+
+    function BeachFieldDecorator() {
+        _classCallCheck(this, BeachFieldDecorator);
+
+        return _possibleConstructorReturn(this, _Abstract.apply(this, arguments));
+    }
+
+    BeachFieldDecorator.prototype.initialize = function initialize() {
+        // Ground
+        this.field.getParts()[0].material = new _three2.default.MeshBasicMaterial({
+            map: window.assetManager.get('textures.wood'),
+            transparent: true
+        });
+
+        // Net
+        this.field.getParts()[3].material = new _three2.default.MeshBasicMaterial({
+            color: 0xDEDEDE,
+            opacity: 0.8,
+            transparent: true
+        });
+
+        // Background
+        var bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(110, 90, 0), new _three2.default.MeshBasicMaterial({
+            map: window.assetManager.get('textures.background')
+        }));
+
+        bg.position.z = -20;
+        bg.position.y = 12;
+
+        this.parts.push(bg);
+    };
+
+    return BeachFieldDecorator;
+}(_abstract2.default);
+
+exports.default = BeachFieldDecorator;
+module.exports = exports['default'];
+
+});
+
+require.register("fieldDecorators/roomFieldDecorator.js", function(exports, require, module) {
+'use strict';
+
+exports.__esModule = true;
+
+var _abstract = require('./abstract');
+
+var _abstract2 = _interopRequireDefault(_abstract);
+
+var _three = require('three');
+
+var _three2 = _interopRequireDefault(_three);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RoomFieldDecorator = function (_Abstract) {
+    _inherits(RoomFieldDecorator, _Abstract);
+
+    function RoomFieldDecorator() {
+        _classCallCheck(this, RoomFieldDecorator);
+
+        return _possibleConstructorReturn(this, _Abstract.apply(this, arguments));
+    }
+
+    RoomFieldDecorator.prototype.initialize = function initialize() {
+        // Ground
+        this.field.getParts()[0].material = new _three2.default.MeshBasicMaterial({
+            color: 0xCCCCCC
+        });
+
+        // Left wall
+        this.field.getParts()[1].material = new _three2.default.MeshBasicMaterial({
+            color: 0xDEDEDE
+        });
+
+        // Right wall
+        this.field.getParts()[2].material = new _three2.default.MeshBasicMaterial({
+            color: 0xDEDEDE
+        });
+
+        // Net
+        this.field.getParts()[3].material = new _three2.default.MeshBasicMaterial({
+            color: 0x111111
+        });
+
+        // Background
+        var bg = new _three2.default.Mesh(new _three2.default.PlaneGeometry(50, 50, 0), new _three2.default.MeshBasicMaterial({
+            color: 0xffffff
+        }));
+
+        bg.position.z = -10;
+        bg.position.y = 12;
+
+        this.parts.push(bg);
+    };
+
+    return RoomFieldDecorator;
+}(_abstract2.default);
+
+exports.default = RoomFieldDecorator;
 module.exports = exports['default'];
 
 });
@@ -1424,7 +1624,8 @@ var screens = {
     "optionsMenu": document.getElementById("optionsMenu"),
     "videoMenu": document.getElementById("videoMenu"),
     "controlsMenu": document.getElementById("controlsMenu"),
-    "rulesMenu": document.getElementById("rulesMenu")
+    "rulesMenu": document.getElementById("rulesMenu"),
+    "mapsMenu": document.getElementById("mapsMenu")
 },
     screenManager = new _screensManager2.default(screens, document.getElementById("flashMessage"), document.getElementById("flashText")),
     assetManager = new _assetManager2.default(),
@@ -1436,6 +1637,10 @@ var screens = {
     videoParameterElements = screens['videoMenu'].querySelectorAll('.videoParameterElement'),
     controlsElements = screens['controlsMenu'].querySelectorAll('.controlKey'),
     rulesElements = screens['rulesMenu'].querySelectorAll('.ruleElement'),
+    mapElements = screens['mapsMenu'].querySelectorAll('.mapElement'),
+    config = {
+    fieldDecorator: 'beach'
+},
     initPlayerControls = [{
     'up': 'z',
     'right': 'd',
@@ -1610,7 +1815,22 @@ function initGame() {
             var ruleName = item.getAttribute('data-ruleName');
             item.value = rules.config[ruleName];
 
-            if (_lodash2.default.isNull(item.onkeyup)) {
+            if (_lodash2.default.isNull(item.onchange)) {
+                item.onchange = onChange;
+            }
+        });
+    });
+
+    // Maps menu is displayed, listen keyboard event on inputs
+    screenManager.on("mapsMenu", function () {
+        var onChange = function onChange(e) {
+            config.fieldDecorator = e.target.value;
+        };
+
+        _lodash2.default.forEach(mapElements, function (item) {
+            item.value = config.fieldDecorator;
+
+            if (_lodash2.default.isNull(item.onchange)) {
                 item.onchange = onChange;
             }
         });
@@ -1622,12 +1842,12 @@ function initGame() {
 
 function newParty() {
     screenManager.hide();
-    screenManager.displayFlashMessage("Game starts !");
+    screenManager.displayFlashMessage("Game starts!");
 
     updateRulesUI();
 
     // Party
-    party = new _party2.default(scene, rules, [{
+    party = new _party2.default(scene, config, rules, [{
         name: 'P1',
         controls: initPlayerControls[0],
         position: 'left'
@@ -1731,6 +1951,10 @@ var _field = require('./field');
 
 var _field2 = _interopRequireDefault(_field);
 
+var _fieldDecoratorFactory = require('./fieldDecoratorFactory');
+
+var _fieldDecoratorFactory2 = _interopRequireDefault(_fieldDecoratorFactory);
+
 var _player = require('./player');
 
 var _player2 = _interopRequireDefault(_player);
@@ -1748,10 +1972,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Party = function () {
-    function Party(scene, rules, playersConfig) {
+    function Party(scene, config, rules, playersConfig) {
         _classCallCheck(this, Party);
 
         this.scene = scene;
+        this.config = config;
         this.rules = rules;
         this.playersConfig = playersConfig;
         this.physics = null;
@@ -1822,6 +2047,7 @@ var Party = function () {
 
         // Field
         this.field = new _field2.default(this.physics.getWorld(), 0, 0, 22, 10);
+        this.field.setDecorator(_fieldDecoratorFactory2.default.factory(this.config.fieldDecorator, this.field));
 
         // Players
         this.players = [];

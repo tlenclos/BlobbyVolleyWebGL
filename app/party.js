@@ -5,13 +5,15 @@ import p2 from 'p2';
 import Ball from './ball';
 import Blob from './blob';
 import Field from './field';
+import FieldDecoratorFactory from './fieldDecoratorFactory';
 import Player from './player';
 import Physics from './physics';
 import Sound from './sound';
 
 export default class Party {
-    constructor (scene, rules, playersConfig) {
+    constructor (scene, config, rules, playersConfig) {
         this.scene = scene;
+        this.config = config;
         this.rules = rules;
         this.playersConfig = playersConfig;
         this.physics = null;
@@ -85,6 +87,7 @@ export default class Party {
 
         // Field
         this.field = new Field(this.physics.getWorld(), 0, 0, 22, 10);
+        this.field.setDecorator(FieldDecoratorFactory.factory(this.config.fieldDecorator, this.field));
 
         // Players
         this.players = [];

@@ -53,6 +53,7 @@
                 <li><a href="javascript:screenManager.goTo('videoMenu')">Video</a></li>
                 <li><a href="javascript:screenManager.goTo('controlsMenu')">Controls</a></li>
                 <li><a href="javascript:screenManager.goTo('rulesMenu')">Rules</a></li>
+                <li><a href="javascript:screenManager.goTo('mapsMenu')">Maps</a></li>
             </ul>
         </div>
 
@@ -89,6 +90,23 @@
             <p><strong>Rules will be applied next game.</strong></p>
             <p><label>Maximum contacts allowed <input type="text" class="ruleElement" data-ruleName="maximumContactsAllowed" /></label></p>
             <p><label>Score to win <input type="text" class="ruleElement" data-ruleName="scoreToWin"/></label></p>
+        </div>
+
+        <div class="screen depthBox" id="mapsMenu">
+            <h2>Maps</h2>
+            <ul>
+                <li><a href="javascript:screenManager.goBack()">Back</a></li>
+            </ul>
+            <p><strong>Map will be applied next game.</strong></p>
+            <p>
+                <label>
+                    Map
+                    <select class="mapElement">
+                        <option value="beach">Beach</option>
+                        <option value="room">Room</option>
+                    </select>
+                </label>
+            </p>
         </div>
 
         <script>require('main');</script>

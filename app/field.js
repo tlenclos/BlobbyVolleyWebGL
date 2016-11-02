@@ -13,20 +13,19 @@ export default class Field {
         this.dims = [width, height];
         this.parts = [];
         this.materials = [];
+        this.fieldDecorator = null;
 
         this.init();
     }
 
     init () {
+        // Base field (ground, walls, net)
         const ground = this.createWall(
             this.x,
             this.y - (this.height / 2) - 0.5,
             this.width,
             1,
             20,
-            window.assetManager.get('textures.wood'),
-            0xEEEEEE,
-            null,
             'type_ground'
         );
 
@@ -34,22 +33,16 @@ export default class Field {
             this.x - (this.width / 2) - 0.5,
             this.y + (this.height / 2),
             1,
-            this.height * 2,
-            20,
-            null,
-            0xDEDEDE,
-            0
+            this.height * 5,
+            20
         );
 
         const rightWall = this.createWall(
             this.x + (this.width / 2) + 0.5,
             this.y + (this.height / 2),
             1,
-            this.height * 2,
-            20,
-            null,
-            0xDEDEDE,
-            0
+            this.height * 5,
+            20
         );
 
         const net = this.createWall(
@@ -57,25 +50,13 @@ export default class Field {
             this.y - (this.height / 2) + (this.height / 4),
             0.3,
             this.height / 2,
-            20,
-            null,
-            0xDEDEDE,
-            0.8
+            20
         );
 
-        // Background
-        const bg = new THREE.Mesh(
-            new THREE.PlaneGeometry(110, 90, 0),
-            new THREE.MeshBasicMaterial({map: window.assetManager.get('textures.background')})
-        );
-
-        bg.position.z = -20;
-        bg.position.y = 12;
-
-        this.parts.push(ground, leftWall, rightWall, net, bg);
+        this.parts.push(ground, leftWall, rightWall, net);
     }
 
-    createWall (x, y, width, height, depth, texture, color, opacity, userData) {
+    createWall (x, y, width, height, depth, userData) {
         const body = new p2.Body({
             mass: 0,
             position: [x, y]
@@ -100,24 +81,12 @@ export default class Field {
 
         this.world.addBody(body);
 
-        const geometry = width > height
-                ? new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0)
-                : new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0);
+        const geometry = new THREE.BoxGeometry(width, height, _.isNumber(depth) ? depth : 0);
 
-        let material;
-
-        if (texture instanceof THREE.Texture) {
-            material = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true
-            });
-        } else {
-            material = new THREE.MeshBasicMaterial({
-                color: !_.isUndefined(color) ? color : 0x000000,
-                opacity: !_.isUndefined(opacity) ? opacity : 1,
-                transparent: true
-            });
-        }
+        const material = new THREE.MeshBasicMaterial({
+            opacity: 0,
+            transparent: true
+        });
 
         const mesh = new THREE.Mesh(
             geometry,
@@ -127,6 +96,10 @@ export default class Field {
         mesh.position.y = body.position[1];
 
         return mesh;
+    }
+
+    setDecorator (fieldDecorator) {
+        this.fieldDecorator = fieldDecorator;
     }
 
     getWorld () {
@@ -142,6 +115,11 @@ export default class Field {
     }
 
     getParts () {
-        return this.parts;
+        const decoratorParts = this.fieldDecorator ? this.fieldDecorator.getParts() : [];
+
+        return [
+            ...this.parts,
+            ...decoratorParts
+        ];
     }
 }
