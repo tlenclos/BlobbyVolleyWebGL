@@ -1,3 +1,4 @@
+import collisions from './collisions';
 import THREE from 'three';
 import _ from 'lodash';
 import p2 from 'p2';
@@ -26,6 +27,8 @@ export default class Field {
             this.width,
             1,
             20,
+            collisions.FIELD,
+            -1,
             'type_ground'
         );
 
@@ -34,7 +37,9 @@ export default class Field {
             this.y + (this.height / 2),
             1,
             this.height * 5,
-            20
+            20,
+            collisions.FIELD,
+            -1
         );
 
         const rightWall = this.createWall(
@@ -42,7 +47,9 @@ export default class Field {
             this.y + (this.height / 2),
             1,
             this.height * 5,
-            20
+            20,
+            collisions.FIELD,
+            -1
         );
 
         const net = this.createWall(
@@ -50,13 +57,25 @@ export default class Field {
             this.y - (this.height / 2) + (this.height / 4),
             0.3,
             this.height / 2,
-            20
+            20,
+            collisions.FIELD,
+            -1
         );
 
-        this.parts.push(ground, leftWall, rightWall, net);
+        const playerSeparatorWall = this.createWall(
+            this.x,
+            this.y - (this.height / 2) + (this.height / 4),
+            0.7,
+            this.height * 5,
+            20,
+            collisions.PLAYER_SEPARATOR,
+            collisions.BLOB
+        );
+
+        this.parts.push(ground, leftWall, rightWall, net, playerSeparatorWall);
     }
 
-    createWall (x, y, width, height, depth, userData) {
+    createWall (x, y, width, height, depth, collisionGroup, collisionMask, userData) {
         const body = new p2.Body({
             mass: 0,
             position: [x, y]
@@ -70,6 +89,9 @@ export default class Field {
             width: width,
             height: height
         });
+
+        shape.collisionGroup = collisionGroup;
+        shape.collisionMask = collisionMask;
 
         body.addShape(shape);
         body.setDensity(1);

@@ -1,3 +1,4 @@
+import collisions from './collisions';
 import THREE from 'three';
 import p2 from 'p2';
 
@@ -10,7 +11,7 @@ export default class Blob {
         this.material = null;
         this.threeObject = null;
         this.radius = 1;
-        this.speed = 5;
+        this.speed = 10;
         this.jumpAllowed = false;
         this._isTouchingGround = false;
         this._isTouchingBall = false;
@@ -28,6 +29,9 @@ export default class Blob {
         const shape = new p2.Circle({
             radius: this.radius
         });
+
+        shape.collisionGroup = collisions.BLOB;
+        shape.collisionMask = collisions.BALL | collisions.FIELD | collisions.PLAYER_SEPARATOR;
 
         body.addShape(shape);
         body.setDensity(100);
@@ -109,14 +113,14 @@ export default class Blob {
             yVelocity = body.velocity[1];
 
         // Allow jumping
-        if (!this.jumpAllowed && yVelocity < 0.00001 && this.isTouchingGround()) {
+        if (!this.jumpAllowed && yVelocity < 0.1 && this.isTouchingGround()) {
             this.jumpAllowed = true;
         }
 
         // Jumping
         if (this.jumpAllowed) {
             body.applyImpulse(
-                p2.vec2.fromValues(0, 9 * this.fixture.mass)
+                p2.vec2.fromValues(0, 15 * this.fixture.mass)
             );
 
             // Prevent jumping
