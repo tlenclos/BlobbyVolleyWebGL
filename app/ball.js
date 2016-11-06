@@ -1,3 +1,4 @@
+import collisions from './collisions';
 import THREE from 'three';
 import Sound from './sound';
 import p2 from 'p2';
@@ -8,7 +9,7 @@ export default class Ball {
         this.color = color;
         this.spawnPosition = spawnPosition;
         this.radius = 1.1; // TODO : If we reduce the radius the ball can be stuck against a wall and the blob can't move it
-        this.maxSpeed = 12;
+        this.maxSpeed = 20;
         this.fixture = null;
         this.material = null;
         this.threeObject = null;
@@ -21,7 +22,7 @@ export default class Ball {
 
     init () {
         const body = new p2.Body({
-            mass: 1,
+            mass: 10,
             position: this.spawnPosition
         });
 
@@ -31,8 +32,11 @@ export default class Ball {
             radius: this.radius
         });
 
+        shape.collisionGroup = collisions.BALL;
+        shape.collisionMask = collisions.BLOB | collisions.FIELD;
+
         body.addShape(shape);
-        body.setDensity(1);
+        body.setDensity(10);
 
         this.material = new p2.Material();
         shape.material = this.material;

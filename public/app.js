@@ -249,6 +249,10 @@ require.register("ball.js", function(exports, require, module) {
 
 exports.__esModule = true;
 
+var _collisions = require('./collisions');
+
+var _collisions2 = _interopRequireDefault(_collisions);
+
 var _three = require('three');
 
 var _three2 = _interopRequireDefault(_three);
@@ -273,7 +277,7 @@ var Ball = function () {
         this.color = color;
         this.spawnPosition = spawnPosition;
         this.radius = 1.1; // TODO : If we reduce the radius the ball can be stuck against a wall and the blob can't move it
-        this.maxSpeed = 12;
+        this.maxSpeed = 20;
         this.fixture = null;
         this.material = null;
         this.threeObject = null;
@@ -286,7 +290,7 @@ var Ball = function () {
 
     Ball.prototype.init = function init() {
         var body = new _p2.default.Body({
-            mass: 1,
+            mass: 10,
             position: this.spawnPosition
         });
 
@@ -296,8 +300,11 @@ var Ball = function () {
             radius: this.radius
         });
 
+        shape.collisionGroup = _collisions2.default.BALL;
+        shape.collisionMask = _collisions2.default.BLOB | _collisions2.default.FIELD;
+
         body.addShape(shape);
-        body.setDensity(1);
+        body.setDensity(10);
 
         this.material = new _p2.default.Material();
         shape.material = this.material;
@@ -390,6 +397,10 @@ require.register("blob.js", function(exports, require, module) {
 
 exports.__esModule = true;
 
+var _collisions = require('./collisions');
+
+var _collisions2 = _interopRequireDefault(_collisions);
+
 var _three = require('three');
 
 var _three2 = _interopRequireDefault(_three);
@@ -413,7 +424,7 @@ var Blob = function () {
         this.material = null;
         this.threeObject = null;
         this.radius = 1;
-        this.speed = 5;
+        this.speed = 10;
         this.jumpAllowed = false;
         this._isTouchingGround = false;
         this._isTouchingBall = false;
@@ -431,6 +442,9 @@ var Blob = function () {
         var shape = new _p2.default.Circle({
             radius: this.radius
         });
+
+        shape.collisionGroup = _collisions2.default.BLOB;
+        shape.collisionMask = _collisions2.default.BALL | _collisions2.default.FIELD | _collisions2.default.PLAYER_SEPARATOR;
 
         body.addShape(shape);
         body.setDensity(100);
@@ -497,13 +511,13 @@ var Blob = function () {
             yVelocity = body.velocity[1];
 
         // Allow jumping
-        if (!this.jumpAllowed && yVelocity < 0.00001 && this.isTouchingGround()) {
+        if (!this.jumpAllowed && yVelocity < 0.1 && this.isTouchingGround()) {
             this.jumpAllowed = true;
         }
 
         // Jumping
         if (this.jumpAllowed) {
-            body.applyImpulse(_p2.default.vec2.fromValues(0, 9 * this.fixture.mass));
+            body.applyImpulse(_p2.default.vec2.fromValues(0, 15 * this.fixture.mass));
 
             // Prevent jumping
             this.jumpAllowed = false;
@@ -534,6 +548,20 @@ var Blob = function () {
 
 exports.default = Blob;
 module.exports = exports['default'];
+
+});
+
+require.register("collisions.js", function(exports, require, module) {
+"use strict";
+
+exports.__esModule = true;
+exports.default = {
+    BLOB: Math.pow(2, 0),
+    BALL: Math.pow(2, 1),
+    FIELD: Math.pow(2, 2),
+    PLAYER_SEPARATOR: Math.pow(2, 3)
+};
+module.exports = exports["default"];
 
 });
 
@@ -586,6 +614,10 @@ require.register("field.js", function(exports, require, module) {
 
 exports.__esModule = true;
 
+var _collisions = require('./collisions');
+
+var _collisions2 = _interopRequireDefault(_collisions);
+
 var _three = require('three');
 
 var _three2 = _interopRequireDefault(_three);
@@ -622,18 +654,20 @@ var Field = function () {
 
     Field.prototype.init = function init() {
         // Base field (ground, walls, net)
-        var ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, 'type_ground');
+        var ground = this.createWall(this.x, this.y - this.height / 2 - 0.5, this.width, 1, 20, _collisions2.default.FIELD, -1, 'type_ground');
 
-        var leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 5, 20);
+        var leftWall = this.createWall(this.x - this.width / 2 - 0.5, this.y + this.height / 2, 1, this.height * 5, 20, _collisions2.default.FIELD, -1);
 
-        var rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 5, 20);
+        var rightWall = this.createWall(this.x + this.width / 2 + 0.5, this.y + this.height / 2, 1, this.height * 5, 20, _collisions2.default.FIELD, -1);
 
-        var net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20);
+        var net = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.3, this.height / 2, 20, _collisions2.default.FIELD, -1);
 
-        this.parts.push(ground, leftWall, rightWall, net);
+        var playerSeparatorWall = this.createWall(this.x, this.y - this.height / 2 + this.height / 4, 0.7, this.height * 5, 20, _collisions2.default.PLAYER_SEPARATOR, _collisions2.default.BLOB);
+
+        this.parts.push(ground, leftWall, rightWall, net, playerSeparatorWall);
     };
 
-    Field.prototype.createWall = function createWall(x, y, width, height, depth, userData) {
+    Field.prototype.createWall = function createWall(x, y, width, height, depth, collisionGroup, collisionMask, userData) {
         var body = new _p2.default.Body({
             mass: 0,
             position: [x, y]
@@ -647,6 +681,9 @@ var Field = function () {
             width: width,
             height: height
         });
+
+        shape.collisionGroup = collisionGroup;
+        shape.collisionMask = collisionMask;
 
         body.addShape(shape);
         body.setDensity(1);
@@ -2043,7 +2080,7 @@ var Party = function () {
         this.scene.add(light);
 
         // Physics
-        this.physics = new _physics2.default(10);
+        this.physics = new _physics2.default(20);
 
         // Field
         this.field = new _field2.default(this.physics.getWorld(), 0, 0, 22, 10);
@@ -2229,7 +2266,7 @@ var Party = function () {
             // Interaction blob vs ball
             world.addContactMaterial(new _p2.default.ContactMaterial(player.blob.material, _this.ball.material, {
                 friction: 0,
-                restitution: 1.1
+                restitution: 2
             }));
 
             // Interaction blob vs ground

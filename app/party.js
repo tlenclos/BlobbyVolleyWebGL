@@ -83,7 +83,7 @@ export default class Party {
         this.scene.add(light);
 
         // Physics
-        this.physics = new Physics(10);
+        this.physics = new Physics(20);
 
         // Field
         this.field = new Field(this.physics.getWorld(), 0, 0, 22, 10);
@@ -287,7 +287,7 @@ export default class Party {
                     this.ball.material,
                     {
                         friction: 0,
-                        restitution: 1.1
+                        restitution: 2
                     }
                 )
             );
